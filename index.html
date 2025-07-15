@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Docker Desktop Setup for Absolute Beginners</title>
+    <title>Interactive Docker & Automation Tutorials - Learn by Doing</title>
     <style>
         /* --- General Styling --- */
         body {
@@ -15,1169 +15,368 @@
             padding: 20px;
         }
 
-        #tutor-container {
-            max-width: 900px;
-            margin: 20px auto;
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
             background-color: #ffffff;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            padding: 20px 30px;
+            margin-bottom: 40px;
         }
 
-        h1, h2 {
-            color: #0d47a1;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 10px;
-        }
-        
         h1 {
-            text-align: center;
-        }
-
-        p {
-            margin-bottom: 1em;
-        }
-
-        /* --- Accordion Styling --- */
-        .stage {
+            color: #0d47a1;
+            font-size: 2.5em;
             margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            overflow: hidden;
         }
 
-        .accordion {
-            background-color: #1976d2;
-            color: white;
-            cursor: pointer;
-            padding: 18px;
-            width: 100%;
-            border: none;
-            text-align: left;
-            outline: none;
-            font-size: 18px;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-            position: relative;
-        }
-        
-        .accordion::after {
-            content: '▼';
-            font-size: 16px;
-            color: #ffffff;
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .accordion.active::after {
-            content: "▲";
-        }
-        
-        .accordion.completed {
-             background-color: #2e7d32;
-        }
-
-        .accordion:hover {
-            background-color: #1565c0;
-        }
-        
-        .accordion.completed:hover {
-            background-color: #1b5e20;
-        }
-
-        .panel {
-            padding: 0 20px;
-            background-color: white;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-out, padding 0.5s ease-out;
-        }
-        
-        .panel-content {
-            padding: 20px 0;
-        }
-
-        /* --- Code & Terminal Styling --- */
-        pre {
-            background-color: #2d2d2d;
-            color: #f8f8f2;
-            padding: 15px;
-            border-radius: 5px;
-            overflow-x: auto;
-            font-family: "Courier New", Courier, monospace;
-            font-size: 14px;
-        }
-        
-        code {
-            font-family: "Courier New", Courier, monospace;
-            background-color: #e0e0e0;
-            padding: 2px 5px;
-            border-radius: 3px;
-        }
-        
-        pre code {
-            background-color: transparent;
-            padding: 0;
-        }
-
-        /* --- Quiz Styling --- */
-        .quiz-form {
-            margin-top: 30px;
-            border-top: 2px solid #e0e0e0;
-            padding-top: 20px;
-        }
-        
-        .question {
+        .tagline {
+            color: #666;
+            font-size: 1.2em;
             margin-bottom: 20px;
         }
 
-        .question p {
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        
-        .question label {
-            display: block;
-            margin-bottom: 8px;
-            padding: 8px 12px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            cursor: pointer;
-            transition: background-color 0.2s, border-color 0.2s;
+        .author-note {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px auto;
+            max-width: 600px;
+            text-align: center;
         }
 
-        .question input[type="radio"] {
-            margin-right: 10px;
-        }
-        
-        .question label.correct-answer {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-            font-weight: bold;
-        }
-        .question label.correct-answer::after {
-            content: ' ✓ Correct';
-            color: #155724;
-            float: right;
+        /* --- Tutorial Cards --- */
+        .tutorials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
         }
 
-        .question label.incorrect-answer {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            font-weight: bold;
-        }
-        .question label.incorrect-answer::after {
-            content: '✗ Incorrect';
-            color: #721c24;
-            float: right;
+        .tutorial-card {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .submit-quiz {
-            background-color: #4CAF50;
+        .tutorial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .tutorial-card h2 {
+            color: #1976d2;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .difficulty-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .beginner {
+            background-color: #4caf50;
             color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
         }
 
-        .submit-quiz:hover {
-            background-color: #45a049;
-        }
-        
-        .quiz-feedback {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-        
-        .quiz-feedback.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .quiz-feedback.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        /* --- Hint Styling --- */
-        .hint-container {
-            margin: 20px 0;
-        }
-        .hint-button {
+        .intermediate {
             background-color: #ff9800;
             color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .hint-text {
-            display: none;
-            margin-top: 10px;
-            padding: 15px;
-            background-color: #fffbe0;
-            border: 1px solid #ffeeba;
-            border-radius: 4px;
         }
 
-        .warning-box {
-            background-color: #fff3cd;
-            border: 1px solid #ffeeba;
-            border-radius: 4px;
-            padding: 15px;
-            margin: 15px 0;
+        .tutorial-description {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
         }
 
-        .warning-box strong {
-            color: #856404;
+        .tutorial-topics {
+            margin-bottom: 20px;
+        }
+
+        .tutorial-topics h3 {
+            font-size: 1em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .tutorial-topics ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .tutorial-topics li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .tutorial-topics li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .tutorial-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #1976d2;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .start-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #1976d2;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .start-button:hover {
+            background-color: #1565c0;
+        }
+
+        /* --- Coming Soon Section --- */
+        .coming-soon {
+            background-color: #fff3e0;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .coming-soon h2 {
+            color: #f57c00;
+            margin-bottom: 20px;
+        }
+
+        .coming-soon-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .coming-soon-item {
+            padding: 15px;
+            background-color: white;
+            border-radius: 5px;
+            border: 2px dashed #ffcc80;
+        }
+
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        footer a {
+            color: #1976d2;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .subscribe-cta {
+            background-color: #2e7d32;
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            margin: 40px auto;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .subscribe-cta h3 {
+            margin-bottom: 10px;
+        }
+
+        .subscribe-cta a {
+            color: #81c784;
+            font-weight: bold;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            
+            .tutorials-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <header>
+            <h1>🚀 Interactive Docker & Automation Tutorials</h1>
+            <p class="tagline">Learn by doing, fail safely, build confidently</p>
+            <div class="author-note">
+                <p><strong>Hey there!</strong> I'm Stacey, and I've made every Docker mistake so you don't have to. These interactive tutorials are based on real disasters, victories, and that one time I accidentally deleted everything. 🙃</p>
+            </div>
+        </header>
 
-    <div id="tutor-container">
-        <h1>Docker Desktop Setup for Absolute Beginners</h1>
-        <p>Welcome! This guide will walk you through setting up Docker Desktop on Windows, creating your first PostgreSQL database, and connecting to it with DBeaver. You'll also learn from my spectacular mistakes so you don't have to repeat them. No prior Docker knowledge required!</p>
-
-        <!-- STAGE 1: SYSTEM REQUIREMENTS -->
-        <div id="stage-1" class="stage">
-            <button class="accordion" data-stage="1">Stage 1: Pre-Flight Check (System Requirements)</button>
-            <div class="panel">
-                <div class="panel-content">
-                    <h2>Before We Begin: Is Your Computer Ready?</h2>
-                    <p>Docker on Windows is like a sophisticated houseguest—it has some specific requirements. Let's make sure your system is ready to host it.</p>
+        <main>
+            <div class="tutorials-grid">
+                <!-- Tutorial 1: Docker Beginner -->
+                <div class="tutorial-card">
+                    <span class="difficulty-badge beginner">Beginner</span>
+                    <h2>Docker Desktop: From Zero to PostgreSQL Hero</h2>
+                    <p class="tutorial-description">
+                        Start your containerization journey from absolute zero. We'll install Docker Desktop on Windows, set up PostgreSQL, connect with DBeaver, and yes—I'll tell you about the time I accidentally nuked all my data with one "helpful" command.
+                    </p>
                     
-                    <h3>What You'll Need:</h3>
-                    <ul>
-                        <li><strong>Windows 10/11 Pro, Enterprise, or Education</strong> (Sorry, Home edition users—Docker Desktop needs Hyper-V)</li>
-                        <li><strong>64-bit processor with virtualization support</strong></li>
-                        <li><strong>4GB RAM minimum</strong> (8GB recommended for a smoother experience)</li>
-                        <li><strong>BIOS-level virtualization enabled</strong> (We'll check this together)</li>
-                    </ul>
-
-                    <h3>Your Task: Check Your Windows Version</h3>
-                    <p>1. Press <code>Windows Key + R</code><br>
-                       2. Type <code>winver</code> and press Enter<br>
-                       3. Check that you have Windows 10 version 2004 or higher, or Windows 11</p>
-                    
-                    <h3>Check Virtualization Status:</h3>
-                    <p>1. Press <code>Ctrl + Shift + Esc</code> to open Task Manager<br>
-                       2. Click the "Performance" tab<br>
-                       3. Select "CPU" on the left<br>
-                       4. Look for "Virtualization: Enabled" on the right</p>
-
-                    <div class="warning-box">
-                        <strong>⚠️ Important:</strong> If virtualization shows as "Disabled," you'll need to enable it in your BIOS. This requires restarting your computer and pressing a key (usually F2, F10, or Delete) during startup. Every computer is different, so Google "[your computer model] enable virtualization" for specific instructions.
-                    </div>
-
-                    <div class="hint-container">
-                        <button class="hint-button" onclick="toggleHint(this, 1)">Show Hint</button>
-                        <div class="hint-text" id="hint-1">
-                            If you have Windows Home edition, you can still use Docker with WSL2, but it's a bit more complex. Consider upgrading to Pro if you'll be doing serious development work. The upgrade usually costs around $99 and can be done directly through Windows Settings.
+                    <div class="tutorial-stats">
+                        <div class="stat">
+                            <div class="stat-number">6</div>
+                            <div class="stat-label">Stages</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">60</div>
+                            <div class="stat-label">Questions</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">45-60</div>
+                            <div class="stat-label">Minutes</div>
                         </div>
                     </div>
 
-                    <form id="quiz-1" class="quiz-form">
-                        <h3>Stage 1 Quiz: Ready for Takeoff?</h3>
-                        
-                        <div class="question">
-                            <p>1. Which Windows editions support Docker Desktop with full features?</p>
-                            <label><input type="radio" name="q1" value="a"> Windows 10/11 Home only</label>
-                            <label><input type="radio" name="q1" value="b"> Windows 10/11 Pro, Enterprise, or Education</label>
-                            <label><input type="radio" name="q1" value="c"> Any version of Windows</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>2. What is the minimum RAM requirement for Docker Desktop?</p>
-                            <label><input type="radio" name="q2" value="a"> 2GB</label>
-                            <label><input type="radio" name="q2" value="b"> 4GB</label>
-                            <label><input type="radio" name="q2" value="c"> 8GB</label>
-                        </div>
+                    <div class="tutorial-topics">
+                        <h3>What You'll Learn:</h3>
+                        <ul>
+                            <li>System requirements & virtualization setup</li>
+                            <li>Installing Docker Desktop with WSL2</li>
+                            <li>Creating your first PostgreSQL container</li>
+                            <li>Connecting with DBeaver (GUI database tool)</li>
+                            <li>Volume management (and how NOT to delete everything)</li>
+                            <li>Best practices from painful experience</li>
+                        </ul>
+                    </div>
 
-                        <div class="question">
-                            <p>3. Where do you check if virtualization is enabled?</p>
-                            <label><input type="radio" name="q3" value="a"> Control Panel</label>
-                            <label><input type="radio" name="q3" value="b"> Task Manager > Performance > CPU</label>
-                            <label><input type="radio" name="q3" value="c"> Windows Settings</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>4. What technology does Docker Desktop use on Windows?</p>
-                            <label><input type="radio" name="q4" value="a"> Only native Windows containers</label>
-                            <label><input type="radio" name="q4" value="b"> WSL2 or Hyper-V</label>
-                            <label><input type="radio" name="q4" value="c"> Java Virtual Machine</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>5. If virtualization is disabled, where do you enable it?</p>
-                            <label><input type="radio" name="q5" value="a"> Windows Settings</label>
-                            <label><input type="radio" name="q5" value="b"> BIOS/UEFI settings</label>
-                            <label><input type="radio" name="q5" value="c"> Docker Desktop settings</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>6. What command shows your Windows version details?</p>
-                            <label><input type="radio" name="q6" value="a"> ver</label>
-                            <label><input type="radio" name="q6" value="b"> winver</label>
-                            <label><input type="radio" name="q6" value="c"> windows -version</label>
-                        </div>
+                    <a href="docker-beginner-tutorial.html" class="start-button">Start Learning →</a>
+                </div>
 
-                        <div class="question">
-                            <p>7. Why does Docker Desktop need virtualization enabled?</p>
-                            <label><input type="radio" name="q7" value="a"> To run Linux containers on Windows</label>
-                            <label><input type="radio" name="q7" value="b"> To look cool</label>
-                            <label><input type="radio" name="q7" value="c"> To use more RAM</label>
+                <!-- Tutorial 2: Docker Networking -->
+                <div class="tutorial-card">
+                    <span class="difficulty-badge intermediate">Intermediate</span>
+                    <h2>Docker Networking: The "Connection Refused" Saga</h2>
+                    <p class="tutorial-description">
+                        Ready to add a web server to your Docker stack? This tutorial walks you through the mysterious world of container networking, port mapping, and why localhost isn't always local. Features real connection errors and their solutions!
+                    </p>
+                    
+                    <div class="tutorial-stats">
+                        <div class="stat">
+                            <div class="stat-number">6</div>
+                            <div class="stat-label">Stages</div>
                         </div>
+                        <div class="stat">
+                            <div class="stat-number">70</div>
+                            <div class="stat-label">Questions</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">60-75</div>
+                            <div class="stat-label">Minutes</div>
+                        </div>
+                    </div>
 
-                        <div class="question">
-                            <p>8. What does WSL2 stand for?</p>
-                            <label><input type="radio" name="q8" value="a"> Windows System Linux 2</label>
-                            <label><input type="radio" name="q8" value="b"> Windows Subsystem for Linux 2</label>
-                            <label><input type="radio" name="q8" value="c"> Windows Server Linux 2</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>9. How much RAM is recommended for a smooth Docker experience?</p>
-                            <label><input type="radio" name="q9" value="a"> 4GB</label>
-                            <label><input type="radio" name="q9" value="b"> 6GB</label>
-                            <label><input type="radio" name="q9" value="c"> 8GB or more</label>
-                        </div>
+                    <div class="tutorial-topics">
+                        <h3>What You'll Master:</h3>
+                        <ul>
+                            <li>Finding and using Docker images (httpd vs apache)</li>
+                            <li>Modifying docker-compose.yaml without breaking everything</li>
+                            <li>Understanding container isolation</li>
+                            <li>Port mapping demystified (HOST:CONTAINER)</li>
+                            <li>Debugging connection refused errors</li>
+                            <li>Making containers talk to the outside world</li>
+                        </ul>
+                    </div>
 
-                        <div class="question">
-                            <p>10. What type of processor architecture does Docker Desktop require?</p>
-                            <label><input type="radio" name="q10" value="a"> 32-bit</label>
-                            <label><input type="radio" name="q10" value="b"> 64-bit</label>
-                            <label><input type="radio" name="q10" value="c"> Either 32-bit or 64-bit</label>
-                        </div>
-
-                        <button type="submit" class="submit-quiz">Check Answers & Proceed</button>
-                        <div id="quiz-1-feedback" class="quiz-feedback" style="display: none;"></div>
-                    </form>
+                    <a href="lesson1.html" class="start-button">Start Learning →</a>
                 </div>
             </div>
-        </div>
-        
-        <!-- STAGE 2: DOWNLOADING AND INSTALLING -->
-        <div id="stage-2" class="stage" style="display: none;">
-            <button class="accordion" data-stage="2">Stage 2: Downloading and Installing Docker Desktop</button>
-            <div class="panel">
-                <div class="panel-content">
-                    <h2>The Main Event: Installing Docker Desktop</h2>
-                    <p>Now that we've confirmed your system is ready, let's get Docker Desktop installed. This is easier than you might think!</p>
-                    
-                    <h3>Your Task: Download Docker Desktop</h3>
-                    <p>1. Go to <a href="https://www.docker.com/products/docker-desktop/" target="_blank">Docker Desktop's official page</a><br>
-                       2. Click the big blue "Download for Windows" button<br>
-                       3. The installer is about 500MB, so grab a coffee while it downloads</p>
 
-                    <h3>Installation Steps:</h3>
-                    <p>1. Run the downloaded installer (Docker Desktop Installer.exe)<br>
-                       2. When prompted, ensure "Use WSL 2 instead of Hyper-V" is checked (recommended)<br>
-                       3. Click "Ok" and let the installation proceed<br>
-                       4. When it finishes, click "Close and restart" (yes, you need to restart)</p>
-
-                    <div class="warning-box">
-                        <strong>⚠️ Common Issue:</strong> If you see "WSL 2 installation is incomplete," don't panic! Windows will prompt you to install WSL2. Just follow the prompts or visit the WSL2 installation page link it provides.
+            <div class="coming-soon">
+                <h2>🔮 Coming Soon</h2>
+                <p>More tutorials are in the works! Here's what's brewing in my Docker laboratory:</p>
+                <div class="coming-soon-list">
+                    <div class="coming-soon-item">
+                        <h3>n8n + AI Agents</h3>
+                        <p>Self-hosted automation with AI that actually does stuff</p>
                     </div>
-
-                    <h3>After Restart:</h3>
-                    <p>1. Docker Desktop should start automatically (look for the whale icon in your system tray)<br>
-                       2. You might see a tutorial—feel free to skip it for now<br>
-                       3. If prompted to sign in, you can skip this too (you don't need an account for local development)</p>
-
-                    <div class="hint-container">
-                        <button class="hint-button" onclick="toggleHint(this, 2)">Show Hint</button>
-                        <div class="hint-text" id="hint-2">
-                            If Docker Desktop doesn't start after restart, try right-clicking the Desktop shortcut and selecting "Run as administrator." Sometimes Windows needs a little extra permission nudge.
-                        </div>
+                    <div class="coming-soon-item">
+                        <h3>Container Communication</h3>
+                        <p>Making containers talk to each other (it's harder than it sounds)</p>
                     </div>
-
-                    <form id="quiz-2" class="quiz-form">
-                        <h3>Stage 2 Quiz: Installation Intelligence</h3>
-                        
-                        <div class="question">
-                            <p>1. What's the approximate size of the Docker Desktop installer?</p>
-                            <label><input type="radio" name="q1" value="a"> 100MB</label>
-                            <label><input type="radio" name="q1" value="b"> 500MB</label>
-                            <label><input type="radio" name="q1" value="c"> 2GB</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>2. What should you choose during installation for best performance?</p>
-                            <label><input type="radio" name="q2" value="a"> Use Hyper-V</label>
-                            <label><input type="radio" name="q2" value="b"> Use WSL 2</label>
-                            <label><input type="radio" name="q2" value="c"> Use neither</label>
-                        </div>
-
-                        <div class="question">
-                            <p>3. After installation, what must you do?</p>
-                            <label><input type="radio" name="q3" value="a"> Configure firewall rules</label>
-                            <label><input type="radio" name="q3" value="b"> Restart your computer</label>
-                            <label><input type="radio" name="q3" value="c"> Install Linux separately</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>4. Where does the Docker Desktop icon appear after installation?</p>
-                            <label><input type="radio" name="q4" value="a"> Only on the desktop</label>
-                            <label><input type="radio" name="q4" value="b"> In the system tray (near the clock)</label>
-                            <label><input type="radio" name="q4" value="c"> In the Start menu only</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>5. Do you need a Docker Hub account for local development?</p>
-                            <label><input type="radio" name="q5" value="a"> Yes, it's mandatory</label>
-                            <label><input type="radio" name="q5" value="b"> No, you can skip sign-in</label>
-                            <label><input type="radio" name="q5" value="c"> Only for Windows 11</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>6. What does the Docker Desktop icon look like?</p>
-                            <label><input type="radio" name="q6" value="a"> A blue whale</label>
-                            <label><input type="radio" name="q6" value="b"> A shipping container</label>
-                            <label><input type="radio" name="q6" value="c"> A box with arrows</label>
-                        </div>
-
-                        <div class="question">
-                            <p>7. If WSL 2 installation is incomplete, what should you do?</p>
-                            <label><input type="radio" name="q7" value="a"> Reinstall Docker Desktop</label>
-                            <label><input type="radio" name="q7" value="b"> Follow the prompt to install WSL2</label>
-                            <label><input type="radio" name="q7" value="c"> Switch to Hyper-V</label>
-                        </div>
-
-                        <div class="question">
-                            <p>8. What's WSL2's main advantage over Hyper-V for Docker?</p>
-                            <label><input type="radio" name="q8" value="a"> It's faster and uses less resources</label>
-                            <label><input type="radio" name="q8" value="b"> It's more colorful</label>
-                            <label><input type="radio" name="q8" value="c"> It doesn't require virtualization</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>9. Can you run Docker Desktop without admin privileges?</p>
-                            <label><input type="radio" name="q9" value="a"> Yes, always</label>
-                            <label><input type="radio" name="q9" value="b"> No, it needs admin rights for installation and first run</label>
-                            <label><input type="radio" name="q9" value="c"> Only on Windows 11</label>
-                        </div>
-
-                        <div class="question">
-                            <p>10. What should you see in the system tray when Docker is running?</p>
-                            <label><input type="radio" name="q10" value="a"> A green checkmark</label>
-                            <label><input type="radio" name="q10" value="b"> The Docker whale icon</label>
-                            <label><input type="radio" name="q10" value="c"> Nothing</label>
-                        </div>
-                        
-                        <button type="submit" class="submit-quiz">Check Answers & Proceed</button>
-                        <div id="quiz-2-feedback" class="quiz-feedback" style="display: none;"></div>
-                    </form>
+                    <div class="coming-soon-item">
+                        <h3>Docker Compose Mastery</h3>
+                        <p>Advanced patterns and real-world architectures</p>
+                    </div>
+                    <div class="coming-soon-item">
+                        <h3>Production Deployment</h3>
+                        <p>Taking your containers from laptop to cloud</p>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- STAGE 3: FIRST CONTAINER - POSTGRESQL -->
-        <div id="stage-3" class="stage" style="display: none;">
-            <button class="accordion" data-stage="3">Stage 3: Your First Container - PostgreSQL</button>
-            <div class="panel">
-                <div class="panel-content">
-                    <h2>Creating Your First Database Container</h2>
-                    <p>Time to create something useful! We'll set up PostgreSQL in a container. Think of it as having a full database server that you can start, stop, or delete without affecting anything else on your computer.</p>
-
-                    <h3>Understanding docker-compose.yaml</h3>
-                    <p>Instead of typing long Docker commands, we'll use a configuration file. It's like a recipe that tells Docker exactly what we want.</p>
-
-                    <h3>Your Task: Create the Configuration</h3>
-                    <p>1. Create a new folder anywhere (e.g., <code>C:\DockerProjects</code>)<br>
-                       2. Inside that folder, create a new file called <code>docker-compose.yaml</code><br>
-                       3. Open it with any text editor (Notepad works fine)<br>
-                       4. Copy this configuration:</p>
-
-<pre><code>version: '3.8'
-
-services:
-  postgres:
-    image: postgres:15
-    container_name: my_postgres
-    environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: mydatabase
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data:</code></pre>
-
-                    <div class="warning-box">
-                        <strong>⚠️ Security Note:</strong> These are example passwords! In real projects, use strong passwords and never commit them to version control. We'll cover better security practices later.
-                    </div>
-
-                    <h3>Starting Your Database:</h3>
-                    <p>1. Open PowerShell or Command Prompt<br>
-                       2. Navigate to your project folder: <code>cd C:\DockerProjects</code><br>
-                       3. Run: <code>docker-compose up -d</code><br>
-                       4. Wait for the magic to happen!</p>
-
-                    <p>You should see Docker downloading the PostgreSQL image (first time only) and then starting your container. The <code>-d</code> flag means "detached" - it runs in the background.</p>
-
-                    <h3>Verify It's Running:</h3>
-                    <p>Run: <code>docker ps</code></p>
-                    <p>You should see your postgres container listed with status "Up"!</p>
-
-                    <div class="hint-container">
-                        <button class="hint-button" onclick="toggleHint(this, 3)">Show Hint</button>
-                        <div class="hint-text" id="hint-3">
-                            If you get a "command not found" error, make sure Docker Desktop is running (check the system tray). If you see "no such file or directory," double-check you're in the right folder where you saved docker-compose.yaml.
-                        </div>
-                    </div>
-
-                    <form id="quiz-3" class="quiz-form">
-                        <h3>Stage 3 Quiz: Container Comprehension</h3>
-                        
-                        <div class="question">
-                            <p>1. What file format does Docker Compose use?</p>
-                            <label><input type="radio" name="q1" value="a"> JSON</label>
-                            <label><input type="radio" name="q1" value="b"> YAML</label>
-                            <label><input type="radio" name="q1" value="c"> XML</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>2. What does the `-d` flag mean in `docker-compose up -d`?</p>
-                            <label><input type="radio" name="q2" value="a"> Delete after running</label>
-                            <label><input type="radio" name="q2" value="b"> Detached (runs in background)</label>
-                            <label><input type="radio" name="q2" value="c"> Development mode</label>
-                        </div>
-
-                        <div class="question">
-                            <p>3. What port does PostgreSQL use by default?</p>
-                            <label><input type="radio" name="q3" value="a"> 3306</label>
-                            <label><input type="radio" name="q3" value="b"> 5432</label>
-                            <label><input type="radio" name="q3" value="c"> 8080</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>4. What does the `volumes` section do?</p>
-                            <label><input type="radio" name="q4" value="a"> Makes the container louder</label>
-                            <label><input type="radio" name="q4" value="b"> Persists data between container restarts</label>
-                            <label><input type="radio" name="q4" value="c"> Limits disk usage</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>5. What command shows running containers?</p>
-                            <label><input type="radio" name="q5" value="a"> docker list</label>
-                            <label><input type="radio" name="q5" value="b"> docker ps</label>
-                            <label><input type="radio" name="q5" value="c"> docker show</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>6. What happens the first time you run `docker-compose up`?</p>
-                            <label><input type="radio" name="q6" value="a"> It fails because images aren't installed</label>
-                            <label><input type="radio" name="q6" value="b"> It automatically downloads needed images</label>
-                            <label><input type="radio" name="q6" value="c"> It asks for your credit card</label>
-                        </div>
-
-                        <div class="question">
-                            <p>7. In the port mapping "5432:5432", what does the first number represent?</p>
-                            <label><input type="radio" name="q7" value="a"> Container port</label>
-                            <label><input type="radio" name="q7" value="b"> Host (your computer) port</label>
-                            <label><input type="radio" name="q7" value="c"> Database size in MB</label>
-                        </div>
-
-                        <div class="question">
-                            <p>8. What's the purpose of `container_name: my_postgres`?</p>
-                            <label><input type="radio" name="q8" value="a"> It's required for the container to work</label>
-                            <label><input type="radio" name="q8" value="b"> It gives the container a friendly name instead of a random one</label>
-                            <label><input type="radio" name="q8" value="c"> It sets the database name</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>9. How do you stop containers started with docker-compose?</p>
-                            <label><input type="radio" name="q9" value="a"> docker-compose stop</label>
-                            <label><input type="radio" name="q9" value="b"> docker-compose down</label>
-                            <label><input type="radio" name="q9" value="c"> Both A and B work</label>
-                        </div>
-
-                        <div class="question">
-                            <p>10. Where is the PostgreSQL data actually stored?</p>
-                            <label><input type="radio" name="q10" value="a"> Inside the container only</label>
-                            <label><input type="radio" name="q10" value="b"> In a Docker volume on your host machine</label>
-                            <label><input type="radio" name="q10" value="c"> In the cloud</label>
-                        </div>
-                        
-                        <button type="submit" class="submit-quiz">Check Answers & Proceed</button>
-                        <div id="quiz-3-feedback" class="quiz-feedback" style="display: none;"></div>
-                    </form>
-                </div>
+            <div class="subscribe-cta">
+                <h3>Want More Tutorials?</h3>
+                <p>Subscribe to my Substack for new tutorials, war stories, and automation tips. It's free, and I promise to only send emails when I have something genuinely useful to share.</p>
+                <p><a href="https://staceycranston.substack.com" target="_blank">Subscribe on Substack →</a></p>
             </div>
-        </div>
-        
-        <!-- STAGE 4: INSTALLING DBEAVER -->
-        <div id="stage-4" class="stage" style="display: none;">
-            <button class="accordion" data-stage="4">Stage 4: Installing DBeaver - Your Database Window</button>
-            <div class="panel">
-                <div class="panel-content">
-                    <h2>Installing DBeaver: Because Command Lines Are So 1990s</h2>
-                    <p>Your PostgreSQL container is running, but how do you actually SEE your data? Enter DBeaver - a free, user-friendly database tool that works with pretty much everything.</p>
+        </main>
 
-                    <h3>Your Task: Download and Install DBeaver</h3>
-                    <p>1. Visit <a href="https://dbeaver.io/download/" target="_blank">DBeaver's download page</a><br>
-                       2. Download the Windows installer (Community Edition is free and perfect for our needs)<br>
-                       3. Run the installer - accept all defaults, they're sensible<br>
-                       4. Launch DBeaver after installation</p>
-
-                    <h3>Connecting to Your PostgreSQL Container:</h3>
-                    <p>1. In DBeaver, click "New Database Connection" (the plug+ icon)<br>
-                       2. Select "PostgreSQL" and click Next<br>
-                       3. Fill in the connection details:</p>
-                    
-                    <ul>
-                        <li><strong>Host:</strong> localhost</li>
-                        <li><strong>Port:</strong> 5432</li>
-                        <li><strong>Database:</strong> mydatabase</li>
-                        <li><strong>Username:</strong> myuser</li>
-                        <li><strong>Password:</strong> mypassword</li>
-                    </ul>
-
-                    <p>4. Click "Test Connection" - you should see "Connected"!<br>
-                       5. Click "OK" to save the connection</p>
-
-                    <div class="warning-box">
-                        <strong>⚠️ Troubleshooting:</strong> If connection fails, make sure:<br>
-                        - Docker Desktop is running<br>
-                        - Your PostgreSQL container is up (`docker ps`)<br>
-                        - You're using "localhost" not "127.0.0.1" (some versions of Windows are picky)
-                    </div>
-
-                    <h3>Create Your First Table:</h3>
-                    <p>1. In DBeaver, expand your connection > Databases > mydatabase > Schemas > public<br>
-                       2. Right-click on "Tables" and select "Create New Table"<br>
-                       3. Name it "test_table" and add a few columns<br>
-                       4. Save and marvel at your containerized database!</p>
-
-                    <div class="hint-container">
-                        <button class="hint-button" onclick="toggleHint(this, 4)">Show Hint</button>
-                        <div class="hint-text" id="hint-4">
-                            DBeaver might prompt you to download PostgreSQL drivers on first connection. Just click "Download" and let it handle everything. It's surprisingly good at figuring out what it needs.
-                        </div>
-                    </div>
-
-                    <form id="quiz-4" class="quiz-form">
-                        <h3>Stage 4 Quiz: Database Detective</h3>
-                        
-                        <div class="question">
-                            <p>1. What is DBeaver?</p>
-                            <label><input type="radio" name="q1" value="a"> A Docker management tool</label>
-                            <label><input type="radio" name="q1" value="b"> A universal database management tool</label>
-                            <label><input type="radio" name="q1" value="c"> A text editor</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>2. When connecting to your containerized PostgreSQL, what host should you use?</p>
-                            <label><input type="radio" name="q2" value="a"> The container name (my_postgres)</label>
-                            <label><input type="radio" name="q2" value="b"> localhost</label>
-                            <label><input type="radio" name="q2" value="c"> docker.internal</label>
-                        </div>
-
-                        <div class="question">
-                            <p>3. Is DBeaver Community Edition free?</p>
-                            <label><input type="radio" name="q3" value="a"> No, it costs $99</label>
-                            <label><input type="radio" name="q3" value="b"> Yes, completely free</label>
-                            <label><input type="radio" name="q3" value="c"> Free for 30 days only</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>4. What might DBeaver need to download on first PostgreSQL connection?</p>
-                            <label><input type="radio" name="q4" value="a"> PostgreSQL itself</label>
-                            <label><input type="radio" name="q4" value="b"> JDBC drivers</label>
-                            <label><input type="radio" name="q4" value="c"> Docker Desktop</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>5. Why use localhost instead of the container name for connection?</p>
-                            <label><input type="radio" name="q5" value="a"> Container names don't work</label>
-                            <label><input type="radio" name="q5" value="b"> We mapped the port to our host machine</label>
-                            <label><input type="radio" name="q5" value="c"> It's faster</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>6. What icon creates a new database connection in DBeaver?</p>
-                            <label><input type="radio" name="q6" value="a"> A plus sign with a plug</label>
-                            <label><input type="radio" name="q6" value="b"> A green arrow</label>
-                            <label><input type="radio" name="q6" value="c"> A database cylinder</label>
-                        </div>
-
-                        <div class="question">
-                            <p>7. Can DBeaver connect to other databases besides PostgreSQL?</p>
-                            <label><input type="radio" name="q7" value="a"> No, PostgreSQL only</label>
-                            <label><input type="radio" name="q7" value="b"> Yes, it supports many database types</label>
-                            <label><input type="radio" name="q7" value="c"> Only SQL databases</label>
-                        </div>
-
-                        <div class="question">
-                            <p>8. What should you click to verify your connection settings work?</p>
-                            <label><input type="radio" name="q8" value="a"> OK</label>
-                            <label><input type="radio" name="q8" value="b"> Test Connection</label>
-                            <label><input type="radio" name="q8" value="c"> Verify</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>9. Where are tables located in DBeaver's navigation tree?</p>
-                            <label><input type="radio" name="q9" value="a"> Connection > Tables</label>
-                            <label><input type="radio" name="q9" value="b"> Connection > Databases > [dbname] > Schemas > public > Tables</label>
-                            <label><input type="radio" name="q9" value="c"> Just under the connection name</label>
-                        </div>
-
-                        <div class="question">
-                            <p>10. If DBeaver can't connect, what should you check first?</p>
-                            <label><input type="radio" name="q10" value="a"> If Docker Desktop and your container are running</label>
-                            <label><input type="radio" name="q10" value="b"> Your internet connection</label>
-                            <label><input type="radio" name="q10" value="c"> Windows Firewall settings</label>
-                        </div>
-                        
-                        <button type="submit" class="submit-quiz">Check Answers & Proceed</button>
-                        <div id="quiz-4-feedback" class="quiz-feedback" style="display: none;"></div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- STAGE 5: VOLUME MANAGEMENT -->
-        <div id="stage-5" class="stage" style="display: none;">
-            <button class="accordion" data-stage="5">Stage 5: Volume Management (Learning from My Disasters)</button>
-            <div class="panel">
-                <div class="panel-content">
-                    <h2>Docker Volumes: Handle with Care!</h2>
-                    <p>Time for a cautionary tale. Docker volumes are where your data lives outside containers. They're powerful, essential, and if you're not careful, very easy to accidentally destroy. Ask me how I know...</p>
-
-                    <h3>Understanding Volumes</h3>
-                    <p>Remember that <code>volumes:</code> section in our docker-compose.yaml? That creates a named volume called <code>postgres_data</code>. This is where PostgreSQL stores all your databases, tables, and data.</p>
-
-                    <p><strong>Why volumes matter:</strong></p>
-                    <ul>
-                        <li>Data persists even when containers stop or are removed</li>
-                        <li>You can update containers without losing data</li>
-                        <li>Multiple containers can share volumes (carefully!)</li>
-                    </ul>
-
-                    <h3>Useful Volume Commands:</h3>
-                    <p>View all volumes:</p>
-                    <pre><code>docker volume ls</code></pre>
-                    
-                    <p>Inspect a specific volume:</p>
-                    <pre><code>docker volume inspect postgres_data</code></pre>
-                    
-                    <p>See what's using a volume:</p>
-                    <pre><code>docker ps -a --filter volume=postgres_data</code></pre>
-
-                    <div class="warning-box">
-                        <strong>⚠️ THE DANGER ZONE - Read This Carefully! ⚠️</strong><br>
-                        The command <code>docker volume prune</code> removes ALL unused volumes.<br>
-                        The command <code>docker volume rm [volume_name]</code> deletes a specific volume.<br>
-                        <strong>BOTH DELETE YOUR DATA PERMANENTLY. THERE IS NO UNDO.</strong><br><br>
-                        Before running any volume deletion commands, always:<br>
-                        1. Run <code>docker volume ls</code> to see what you have<br>
-                        2. Back up any important data<br>
-                        3. Double-check you're deleting the right thing<br>
-                        4. Have a coffee and think about it one more time
-                    </div>
-
-                    <h3>My Personal Disaster Story:</h3>
-                    <p>When trying to add pgvector extension, an AI assistant suggested I "clean up volumes first" with <code>docker volume prune -a</code>. That little <code>-a</code> flag? It means "all volumes, even ones in use." Three days of test data: gone. Lessons learned:</p>
-                    <ul>
-                        <li>AI assistants don't know your specific setup</li>
-                        <li>Always understand what a command does before running it</li>
-                        <li>Backups are not optional</li>
-                    </ul>
-
-                    <h3>Best Practices:</h3>
-                    <p>1. <strong>Name your volumes</strong> (like we did with postgres_data)<br>
-                       2. <strong>Back up regularly</strong>: <code>docker exec my_postgres pg_dump -U myuser mydatabase > backup.sql</code><br>
-                       3. <strong>Think twice, delete once</strong><br>
-                       4. <strong>Use .dockerignore</strong> to prevent accidental volume mounts of sensitive data</p>
-
-                    <div class="hint-container">
-                        <button class="hint-button" onclick="toggleHint(this, 5)">Show Hint</button>
-                        <div class="hint-text" id="hint-5">
-                            Pro tip: Create a simple backup script that runs pg_dump and saves with a timestamp. Run it before any major changes. Future you will thank present you when something inevitably goes wrong.
-                        </div>
-                    </div>
-
-                    <form id="quiz-5" class="quiz-form">
-                        <h3>Stage 5 Quiz: Volume Vigilance</h3>
-                        
-                        <div class="question">
-                            <p>1. What do Docker volumes store?</p>
-                            <label><input type="radio" name="q1" value="a"> Container configuration</label>
-                            <label><input type="radio" name="q1" value="b"> Persistent data that survives container restarts</label>
-                            <label><input type="radio" name="q1" value="c"> Docker images</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>2. What command lists all Docker volumes?</p>
-                            <label><input type="radio" name="q2" value="a"> docker volume list</label>
-                            <label><input type="radio" name="q2" value="b"> docker volume ls</label>
-                            <label><input type="radio" name="q2" value="c"> docker volumes</label>
-                        </div>
-
-                        <div class="question">
-                            <p>3. What does `docker volume prune` do?</p>
-                            <label><input type="radio" name="q3" value="a"> Optimizes volume storage</label>
-                            <label><input type="radio" name="q3" value="b"> Removes unused volumes permanently</label>
-                            <label><input type="radio" name="q3" value="c"> Backs up volumes</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>4. Can you recover data after running `docker volume rm`?</p>
-                            <label><input type="radio" name="q4" value="a"> Yes, from Docker's recycle bin</label>
-                            <label><input type="radio" name="q4" value="b"> No, it's permanently deleted</label>
-                            <label><input type="radio" name="q4" value="c"> Yes, within 24 hours</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>5. What flag makes `docker volume prune` even more dangerous?</p>
-                            <label><input type="radio" name="q5" value="a"> -f (force)</label>
-                            <label><input type="radio" name="q5" value="b"> -a (all)</label>
-                            <label><input type="radio" name="q5" value="c"> -d (delete)</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>6. How can you back up a PostgreSQL database from a container?</p>
-                            <label><input type="radio" name="q6" value="a"> Copy the volume files directly</label>
-                            <label><input type="radio" name="q6" value="b"> Use pg_dump through docker exec</label>
-                            <label><input type="radio" name="q6" value="c"> Volumes back up automatically</label>
-                        </div>
-
-                        <div class="question">
-                            <p>7. What happens to a volume when you remove a container?</p>
-                            <label><input type="radio" name="q7" value="a"> The volume is deleted too</label>
-                            <label><input type="radio" name="q7" value="b"> The volume persists unless explicitly removed</label>
-                            <label><input type="radio" name="q7" value="c"> It depends on the container type</label>
-                        </div>
-
-                        <div class="question">
-                            <p>8. Why should you name your volumes?</p>
-                            <label><input type="radio" name="q8" value="a"> It's required by Docker</label>
-                            <label><input type="radio" name="q8" value="b"> To avoid accidentally deleting the wrong volume</label>
-                            <label><input type="radio" name="q8" value="c"> Named volumes are faster</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>9. Before running any volume deletion command, you should:</p>
-                            <label><input type="radio" name="q9" value="a"> Restart Docker Desktop</label>
-                            <label><input type="radio" name="q9" value="b"> List volumes and verify what you're deleting</label>
-                            <label><input type="radio" name="q9" value="c"> Stop all containers</label>
-                        </div>
-
-                        <div class="question">
-                            <p>10. What's the main lesson about AI assistants and dangerous commands?</p>
-                            <label><input type="radio" name="q10" value="a"> Never use AI assistants</label>
-                            <label><input type="radio" name="q10" value="b"> Always understand what a command does before running it</label>
-                            <label><input type="radio" name="q10" value="c"> AI assistants are always right</label>
-                        </div>
-                        
-                        <button type="submit" class="submit-quiz">Check Answers & Proceed</button>
-                        <div id="quiz-5-feedback" class="quiz-feedback" style="display: none;"></div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- STAGE 6: BEST PRACTICES -->
-        <div id="stage-6" class="stage" style="display: none;">
-            <button class="accordion" data-stage="6">Stage 6: Best Practices and Next Steps</button>
-            <div class="panel">
-                <div class="panel-content">
-                    <h2>You Made It! Now Let's Keep You Safe</h2>
-                    <p>Congratulations! You've got Docker running, PostgreSQL containerized, and DBeaver connected. You've even learned from my mistakes. Let's wrap up with some best practices to keep your Docker journey smooth.</p>
-
-                    <h3>Security Best Practices:</h3>
-                    <ul>
-                        <li><strong>Never use default passwords in production</strong></li>
-                        <li><strong>Use environment variables</strong> for sensitive data:
-                            <pre><code>POSTGRES_PASSWORD=${DB_PASSWORD}</code></pre>
-                        </li>
-                        <li><strong>Don't expose ports unnecessarily</strong> - only map what you need</li>
-                        <li><strong>Keep Docker Desktop updated</strong> - security patches matter</li>
-                    </ul>
-
-                    <h3>Performance Tips:</h3>
-                    <ul>
-                        <li><strong>Limit container resources</strong> to prevent one container from hogging everything:
-<pre><code>services:
-  postgres:
-    image: postgres:15
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M</code></pre>
-                        </li>
-                        <li><strong>Use .dockerignore</strong> to exclude unnecessary files</li>
-                        <li><strong>Clean up unused images</strong>: <code>docker image prune</code></li>
-                    </ul>
-
-                    <h3>Development Workflow:</h3>
-                    <ol>
-                        <li><strong>Version control your docker-compose.yaml</strong> (but not passwords!)</li>
-                        <li><strong>Document your setup</strong> - future you will appreciate it</li>
-                        <li><strong>Use consistent naming</strong> for containers and volumes</li>
-                        <li><strong>Test locally before deploying</strong></li>
-                    </ol>
-
-                    <h3>Common Commands Cheat Sheet:</h3>
-                    <pre><code># Start your stack
-docker-compose up -d
-
-# Stop everything
-docker-compose down
-
-# See what's running
-docker ps
-
-# Check logs
-docker logs my_postgres
-
-# Execute commands in container
-docker exec -it my_postgres psql -U myuser
-
-# Emergency stop all containers
-docker stop $(docker ps -q)</code></pre>
-
-                    <h3>Where to Go From Here:</h3>
-                    <p>Now that you have the basics, consider exploring:</p>
-                    <ul>
-                        <li>Adding more services (Redis, RabbitMQ, etc.)</li>
-                        <li>Creating custom Docker images with Dockerfiles</li>
-                        <li>Docker networking for multi-container communication</li>
-                        <li>Container orchestration with Docker Swarm or Kubernetes</li>
-                    </ul>
-
-                    <p><strong>Remember:</strong> Everyone was a beginner once. The Docker community is generally helpful - don't be afraid to ask questions. Just maybe double-check any commands involving the word "prune" before running them! 😄</p>
-
-                    <form id="quiz-6" class="quiz-form">
-                        <h3>Stage 6 Quiz: Final Wisdom</h3>
-                        
-                        <div class="question">
-                            <p>1. Where should you store passwords for production use?</p>
-                            <label><input type="radio" name="q1" value="a"> Directly in docker-compose.yaml</label>
-                            <label><input type="radio" name="q1" value="b"> In environment variables or secrets management</label>
-                            <label><input type="radio" name="q1" value="c"> In a passwords.txt file</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>2. What file prevents unnecessary files from being sent to Docker?</p>
-                            <label><input type="radio" name="q2" value="a"> .gitignore</label>
-                            <label><input type="radio" name="q2" value="b"> .dockerignore</label>
-                            <label><input type="radio" name="q2" value="c"> .dockerskip</label>
-                        </div>
-
-                        <div class="question">
-                            <p>3. How can you limit a container's memory usage?</p>
-                            <label><input type="radio" name="q3" value="a"> You can't - containers use what they need</label>
-                            <label><input type="radio" name="q3" value="b"> Using deploy.resources.limits in docker-compose</label>
-                            <label><input type="radio" name="q3" value="c"> Only through Docker Desktop settings</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>4. What should you version control?</p>
-                            <label><input type="radio" name="q4" value="a"> docker-compose.yaml only</label>
-                            <label><input type="radio" name="q4" value="b"> docker-compose.yaml and .env files with real passwords</label>
-                            <label><input type="radio" name="q4" value="c"> docker-compose.yaml and .env.example (without real passwords)</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>5. What command removes unused Docker images?</p>
-                            <label><input type="radio" name="q5" value="a"> docker image prune</label>
-                            <label><input type="radio" name="q5" value="b"> docker image remove --unused</label>
-                            <label><input type="radio" name="q5" value="c"> docker clean images</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>6. How do you execute a command inside a running container?</p>
-                            <label><input type="radio" name="q6" value="a"> docker run [container] [command]</label>
-                            <label><input type="radio" name="q6" value="b"> docker exec [container] [command]</label>
-                            <label><input type="radio" name="q6" value="c"> docker command [container] [command]</label>
-                        </div>
-
-                        <div class="question">
-                            <p>7. What's the safest approach to production passwords?</p>
-                            <label><input type="radio" name="q7" value="a"> Use strong passwords in docker-compose.yaml</label>
-                            <label><input type="radio" name="q7" value="b"> Use a secrets management system</label>
-                            <label><input type="radio" name="q7" value="c"> Share passwords via email</label>
-                        </div>
-
-                        <div class="question">
-                            <p>8. Why is documentation important for Docker projects?</p>
-                            <label><input type="radio" name="q8" value="a"> It's not - Docker is self-documenting</label>
-                            <label><input type="radio" name="q8" value="b"> Future you (or teammates) need to understand the setup</label>
-                            <label><input type="radio" name="q8" value="c"> Docker Desktop requires it</label>
-                        </div>
-                        
-                        <div class="question">
-                            <p>9. What's a good next step after mastering basic Docker?</p>
-                            <label><input type="radio" name="q9" value="a"> Immediately jump to Kubernetes</label>
-                            <label><input type="radio" name="q9" value="b"> Learn about Dockerfiles and custom images</label>
-                            <label><input type="radio" name="q9" value="c"> Uninstall Docker and use VMs instead</label>
-                        </div>
-
-                        <div class="question">
-                            <p>10. What's the most important lesson from this tutorial?</p>
-                            <label><input type="radio" name="q10" value="a"> Docker is too complicated for beginners</label>
-                            <label><input type="radio" name="q10" value="b"> Always understand commands before running them</label>
-                            <label><input type="radio" name="q10" value="c"> Never trust AI assistants</label>
-                        </div>
-                        
-                        <button type="submit" class="submit-quiz">Complete Tutorial!</button>
-                        <div id="quiz-6-feedback" class="quiz-feedback" style="display: none;"></div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
+        <footer>
+            <p>Created with ☕ and stubbornness by <a href="https://staceycranston.substack.com" target="_blank">Stacey Cranston</a></p>
+            <p>Questions? Found a bug? <a href="https://github.com/staceycranston" target="_blank">GitHub</a> | <a href="https://staceycranston.substack.com" target="_blank">Substack</a></p>
+            <p><small>Remember: Every expert was once a disaster. You're just on your journey to expertise. 🚀</small></p>
+        </footer>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            
-            let currentStage = 1;
-            const totalStages = 6;
-            
-            const correctAnswers = {
-                1: { q1: 'b', q2: 'b', q3: 'b', q4: 'b', q5: 'b', q6: 'b', q7: 'a', q8: 'b', q9: 'c', q10: 'b' },
-                2: { q1: 'b', q2: 'b', q3: 'b', q4: 'b', q5: 'b', q6: 'a', q7: 'b', q8: 'a', q9: 'b', q10: 'b' },
-                3: { q1: 'b', q2: 'b', q3: 'b', q4: 'b', q5: 'b', q6: 'b', q7: 'b', q8: 'b', q9: 'c', q10: 'b' },
-                4: { q1: 'b', q2: 'b', q3: 'b', q4: 'b', q5: 'b', q6: 'a', q7: 'b', q8: 'b', q9: 'b', q10: 'a' },
-                5: { q1: 'b', q2: 'b', q3: 'b', q4: 'b', q5: 'b', q6: 'b', q7: 'b', q8: 'b', q9: 'b', q10: 'b' },
-                6: { q1: 'b', q2: 'b', q3: 'b', q4: 'c', q5: 'a', q6: 'b', q7: 'b', q8: 'b', q9: 'b', q10: 'b' }
-            };
-
-            function updatePanelHeight(element) {
-                const panel = element.closest('.panel');
-                if (!panel) return;
-                const accordion = panel.previousElementSibling;
-                if (accordion.classList.contains('active')) {
-                    panel.style.maxHeight = panel.scrollHeight + "px";
-                }
-            }
-
-            const accordions = document.querySelectorAll('.accordion');
-            accordions.forEach(acc => {
-                acc.addEventListener('click', function() {
-                    const stageNum = parseInt(this.dataset.stage);
-                    if (stageNum > currentStage) {
-                        return;
-                    }
-
-                    this.classList.toggle('active');
-                    const panel = this.nextElementSibling;
-                    if (panel.style.maxHeight) {
-                        panel.style.maxHeight = null;
-                        panel.style.padding = "0 20px";
-                    } else {
-                        panel.style.maxHeight = panel.scrollHeight + "px";
-                        panel.style.padding = "0 20px";
-                    }
-                });
-            });
-            
-            window.toggleHint = function(buttonElement, stageNum) {
-                const hintText = document.getElementById(`hint-${stageNum}`);
-                hintText.style.display = hintText.style.display === 'block' ? 'none' : 'block';
-                updatePanelHeight(buttonElement);
-            }
-
-            const quizForms = document.querySelectorAll('.quiz-form');
-            quizForms.forEach(form => {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    const stageNum = parseInt(this.id.split('-')[1]);
-                    const answers = correctAnswers[stageNum];
-                    const formData = new FormData(this);
-                    
-                    let score = 0;
-                    let totalQuestions = 0;
-
-                    for (const key in answers) {
-                        totalQuestions++;
-                        const userAnswer = formData.get(key);
-                        const correctAnswer = answers[key];
-                        
-                        const allRadiosForQuestion = document.querySelectorAll(`input[name="${key}"]`);
-
-                        allRadiosForQuestion.forEach(radio => {
-                            const label = radio.parentElement;
-                            label.classList.remove('correct-answer', 'incorrect-answer');
-
-                            if (radio.value === correctAnswer) {
-                                if (userAnswer === correctAnswer) {
-                                    label.classList.add('correct-answer');
-                                }
-                            } else if (radio.checked) {
-                                label.classList.add('incorrect-answer');
-                            }
-                        });
-
-                        if (userAnswer === correctAnswer) {
-                            score++;
-                        }
-                    }
-
-                    const feedbackEl = document.getElementById(`quiz-${stageNum}-feedback`);
-                    feedbackEl.style.display = 'block';
-                    updatePanelHeight(feedbackEl);
-
-                    if (score === totalQuestions) {
-                        feedbackEl.textContent = `Perfect! You scored ${score}/${totalQuestions}. `;
-                        feedbackEl.className = 'quiz-feedback success';
-                        
-                        const currentAccordion = document.querySelector(`.accordion[data-stage="${stageNum}"]`);
-                        
-                        if (stageNum < totalStages) {
-                            feedbackEl.textContent += "Unlocking the next stage...";
-                            currentStage++;
-                            setTimeout(() => {
-                                currentAccordion.classList.remove('active');
-                                currentAccordion.classList.add('completed');
-                                currentAccordion.nextElementSibling.style.maxHeight = null;
-                                showStage(currentStage);
-                            }, 2000);
-                        } else {
-                           feedbackEl.textContent += "Congratulations! You've completed the Docker setup tutorial! 🎉";
-                           currentAccordion.classList.add('completed');
-                        }
-
-                    } else {
-                        feedbackEl.textContent = `Not quite. You scored ${score}/${totalQuestions}. Review your answers and try again.`;
-                        feedbackEl.className = 'quiz-feedback error';
-                    }
-                });
-            });
-
-            function showStage(stageNum) {
-                const stageToShow = document.getElementById(`stage-${stageNum}`);
-                if (stageToShow) {
-                    stageToShow.style.display = 'block';
-                    const accordion = stageToShow.querySelector('.accordion');
-                    const panel = accordion.nextElementSibling;
-                    accordion.classList.add('active');
-                    setTimeout(() => {
-                        panel.style.maxHeight = panel.scrollHeight + "px";
-                    }, 50);
-                }
-            }
-
-            showStage(currentStage);
-
-        });
-    </script>
-
 </body>
 </html>
