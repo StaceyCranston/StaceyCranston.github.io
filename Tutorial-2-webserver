@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Docker & Networking Tutor</title>
+    <style>
+        /* --- General Styling --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #tutor-container {
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px 30px;
+        }
+
+        h1, h2 {
+            color: #0d47a1;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        
+        h1 {
+            text-align: center;
+        }
+
+        p {
+            margin-bottom: 1em;
+        }
+
+        /* --- Accordion Styling --- */
+        .stage {
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .accordion {
+            background-color: #1976d2;
+            color: white;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            position: relative;
+        }
+        
+        .accordion::after {
+            content: '▼'; /* Collapsed Icon */
+            font-size: 16px;
+            color: #ffffff;
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .accordion.active::after {
+            content: "▲"; /* Expanded Icon */
+        }
+        
+        .accordion.completed {
+             background-color: #2e7d32; /* Green for completed */
+        }
+
+        .accordion:hover {
+            background-color: #1565c0;
+        }
+        
+        .accordion.completed:hover {
+            background-color: #1b5e20;
+        }
+
+        .panel {
+            padding: 0 20px;
+            background-color: white;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+        }
+        
+        .panel-content {
+            padding: 20px 0;
+        }
+
+        /* --- Code & Terminal Styling --- */
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 14px;
+        }
+        
+        code {
+            font-family: "Courier New", Courier, monospace;
+            background-color: #e0e0e0;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+
+        /* --- Quiz Styling --- */
+        .quiz-form {
+            margin-top: 30px;
+            border-top: 2px solid #e0e0e0;
+            padding-top: 20px;
+        }
+        
+        .question {
+            margin-bottom: 20px;
+        }
+
+        .question p {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .question label {
+            display: block;
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .question input[type="radio"] {
+            margin-right: 10px;
+        }
+        
+        /* **NEW**: Styles for Correct/Incorrect Answers */
+        .question label.correct-answer {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            font-weight: bold;
+        }
+        .question label.correct-answer::after {
+            content: ' ✓ Correct';
+            color: #155724;
+            float: right;
+        }
+
+        .question label.incorrect-answer {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            font-weight: bold;
+        }
+        .question label.incorrect-answer::after {
+            content: '✗ Incorrect';
+            color: #721c24;
+            float: right;
+        }
+        /* Style to reveal the correct answer if the user got it wrong */
+        .question label.reveal-correct {
+            border: 2px solid #2e7d32;
+        }
+        .question label.reveal-correct::after {
+            content: ' ✓ Correct Answer';
+            color: #1b5e20;
+            float: right;
+        }
+
+
+        .submit-quiz {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .submit-quiz:hover {
+            background-color: #45a049;
+        }
+        
+        .quiz-feedback {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .quiz-feedback.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .quiz-feedback.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* --- Hint Styling --- */
+        .hint-container {
+            margin: 20px 0;
+        }
+        .hint-button {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .hint-text {
+            display: none;
+            margin-top: 10px;
+            padding: 15px;
+            background-color: #fffbe0;
+            border: 1px solid #ffeeba;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="tutor-container">
+        <!-- The HTML for the stages remains the same -->
+        <h1>Interactive Docker & Networking Tutor</h1>
+        <p>Welcome! This guide will walk you through adding a web server to your existing Docker setup. You'll learn about Docker images, how to modify your <code>docker-compose.yaml</code> file, and the basics of container networking. Complete each stage to unlock the next one!</p>
+
+        <!-- STAGE 1: FINDING THE IMAGE -->
+        <div id="stage-1" class="stage">
+            <button class="accordion" data-stage="1">Stage 1: Finding the Right Docker Image</button>
+            <div class="panel">
+                <div class="panel-content">
+                    <h2>What's a Docker Image?</h2>
+                    <p>Think of a Docker Image as a blueprint or a template for your application. It contains everything needed to run: the application code, a runtime (like Node.js or Java), libraries, and system tools. When you run an image, you create a <strong>Container</strong>, which is a live, running instance of that image.</p>
+                    <p>These images are stored in a place called a <strong>Registry</strong>. The most popular public registry is <strong>Docker Hub</strong>. For our web server, we'll use Apache, which is one of the world's most popular web servers. In the Docker world, it's officially known by its project name: <code>httpd</code>.</p>
+                    
+                    <h3>Your Task: Find the Official Image</h3>
+                    <p>1. Open your web browser and go to <a href="https://hub.docker.com/" target="_blank">https://hub.docker.com/</a>.<br>
+                       2. In the search bar, type <code>httpd</code> and press Enter.<br>
+                       3. The first result should be the "Official Image". You can identify official images because they don't have a username prefix (like <code>username/my-image</code>) and they usually have a special badge.</p>
+                    <p>The name you'll use to tell Docker to download this image is simply <code>httpd</code>. Docker will automatically assume you mean the latest version, which can also be written as <code>httpd:latest</code>.</p>
+
+                    <div class="hint-container">
+                        <button class="hint-button" onclick="toggleHint(this, 1)">Show Hint</button>
+                        <div class="hint-text" id="hint-1">
+                            Look for the result that just says "httpd" and has a "Docker Official Image" badge next to it. This ensures you're getting a well-maintained and secure base for your service.
+                        </div>
+                    </div>
+
+                    <form id="quiz-1" class="quiz-form">
+                        <h3>Stage 1 Quiz: Test Your Knowledge!</h3>
+                        
+                        <div class="question">
+                            <p>1. What is the central place where Docker images are stored and shared?</p>
+                            <label><input type="radio" name="q1" value="a"> GitHub</label>
+                            <label><input type="radio" name="q1" value="b"> A Docker Registry (like Docker Hub)</label>
+                            <label><input type="radio" name="q1" value="c"> The Docker Engine</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>2. What is a running instance of a Docker image called?</p>
+                            <label><input type="radio" name="q2" value="a"> A blueprint</label>
+                            <label><input type="radio" name="q2" value="b"> A layer</label>
+                            <label><input type="radio" name="q2" value="c"> A container</label>
+                        </div>
+
+                        <div class="question">
+                            <p>3. To use the official Apache web server image, what name should you use?</p>
+                            <label><input type="radio" name="q3" value="a"> apache</label>
+                            <label><input type="radio" name="q3" value="b"> httpd</label>
+                            <label><input type="radio" name="q3" value="c"> webserver</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>4. How can you identify an official image on Docker Hub?</p>
+                            <label><input type="radio" name="q4" value="a"> It has the most downloads.</label>
+                            <label><input type="radio" name="q4" value="b"> It has a "Docker Official Image" badge and no username prefix.</label>
+                            <label><input type="radio" name="q4" value="c"> The description is written in all caps.</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>5. If you just specify the image name `httpd`, what tag does Docker assume by default?</p>
+                            <label><input type="radio" name="q5" value="a"> :stable</label>
+                            <label><input type="radio" name="q5" value="b"> :production</label>
+                            <label><input type="radio" name="q5" value="c"> :latest</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>6. An image contains...</p>
+                            <label><input type="radio" name="q6" value="a"> Only the application code.</label>
+                            <label><input type="radio" name="q6" value="b"> The application code, runtime, libraries, and tools.</label>
+                            <label><input type="radio" name="q6" value="c"> Only a live, running process.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>7. The primary benefit of using an "Official Image" is that it's typically...</p>
+                            <label><input type="radio" name="q7" value="a"> Smaller in size than any other image.</label>
+                            <label><input type="radio" name="q7" value="b"> Well-documented, secure, and follows best practices.</label>
+                            <label><input type="radio" name="q7" value="c"> The only one that will work on Windows.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>8. What is a Dockerfile?</p>
+                            <label><input type="radio" name="q8" value="a"> A file that lists running containers.</label>
+                            <label><input type="radio" name="q8" value="b"> The script with instructions to build a Docker image.</label>
+                            <label><input type="radio" name="q8" value="c"> A log file generated by a container.</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>9. What does the term "pulling an image" mean?</p>
+                            <label><input type="radio" name="q9" value="a"> Deleting an image from your computer.</label>
+                            <label><input type="radio" name="q9" value="b"> Starting a container from an image.</label>
+                            <label><input type="radio" name="q9" value="c"> Downloading an image from a registry to your local machine.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>10. What is the relationship between an image and a container?</p>
+                            <label><input type="radio" name="q10" value="a"> They are the same thing.</label>
+                            <label><input type="radio" name="q10" value="b"> An image is a running instance of a container.</label>
+                            <label><input type="radio" name="q10" value="c"> A container is a running instance of an image.</label>
+                        </div>
+
+                        <button type="submit" class="submit-quiz">Check Answers & Proceed</button>
+                        <div id="quiz-1-feedback" class="quiz-feedback" style="display: none;"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- STAGE 2: MODIFYING DOCKER-COMPOSE -->
+        <div id="stage-2" class="stage" style="display: none;">
+            <button class="accordion" data-stage="2">Stage 2: Add the Web Server to `docker-compose.yaml`</button>
+            <div class="panel">
+                <div class="panel-content">
+                    <h2>Defining Services in Docker Compose</h2>
+                    <p>The <code>docker-compose.yaml</code> file is your central configuration for running multi-container applications. It's written in a format called YAML, where <strong>indentation is very important</strong>. Under the main <code>services</code> key, you define each part of your application. You already have services for <code>n8n</code> and <code>postgres</code>.</p>
+                    <p>We are now going to add a third service for our Apache web server. We'll call it <code>webserver</code>.</p>
+                    
+                    <h3>Your Task: Edit the File</h3>
+                    <p>1. Open your <code>docker-compose.yaml</code> file in a text editor (like VS Code, Notepad++, etc.).<br>
+                       2. Your file currently looks something like this (versions and other details might vary):</p>
+<pre><code>version: '3.7'
+
+services:
+  postgres:
+    image: postgres:11
+    restart: always
+    environment:
+      - POSTGRES_USER=...
+      - POSTGRES_PASSWORD=...
+      - POSTGRES_DB=...
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  n8n:
+    image: n8nio/n8n
+    restart: always
+    ports:
+      - "5678:5678"
+    environment:
+      - DB_TYPE=postgresdb
+      # ... other environment variables
+    depends_on:
+      - postgres
+
+volumes:
+  db_data:
+</code></pre>
+                    <p>3. Add the new <code>webserver</code> service to the file. It should be at the same indentation level as <code>postgres</code> and <code>n8n</code>. For now, we will only specify the image.</p>
+<pre><code>version: '3.7'
+
+services:
+  postgres:
+    # ... (postgres configuration remains unchanged)
+
+  n8n:
+    # ... (n8n configuration remains unchanged)
+  
+  <mark>webserver:
+    image: httpd:latest</mark>
+
+volumes:
+  db_data:
+</code></pre>
+                    <p>4. Save the file. That's it! You've told Docker Compose that you want a third container running, based on the <code>httpd:latest</code> image we found in Stage 1.</p>
+
+                    <div class="hint-container">
+                        <button class="hint-button" onclick="toggleHint(this, 2)">Show Hint</button>
+                        <div class="hint-text" id="hint-2">
+                           In YAML, structure is defined by indentation, not brackets. Make sure the word `webserver:` lines up perfectly with `postgres:` and `n8n:`. The `image:` line must be indented with two spaces underneath `webserver:`.
+                        </div>
+                    </div>
+
+                    <form id="quiz-2" class="quiz-form">
+                        <h3>Stage 2 Quiz: Docker Compose Basics</h3>
+                        
+                        <div class="question">
+                            <p>1. What language is `docker-compose.yaml` written in?</p>
+                            <label><input type="radio" name="q1" value="a"> JSON</label>
+                            <label><input type="radio" name="q1" value="b"> XML</label>
+                            <label><input type="radio" name="q1" value="c"> YAML</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>2. What is the most critical syntax rule in YAML?</p>
+                            <label><input type="radio" name="q2" value="a"> Indentation</label>
+                            <label><input type="radio" name="q2" value="b"> Using semicolons at the end of lines</label>
+                            <label><input type="radio" name="q2" value="c"> All keys must be in quotes</label>
+                        </div>
+
+                        <div class="question">
+                            <p>3. In our `docker-compose.yaml`, `webserver`, `n8n`, and `postgres` are all examples of...?</p>
+                            <label><input type="radio" name="q3" value="a"> Images</label>
+                            <label><input type="radio" name="q3" value="b"> Services</label>
+                            <label><input type="radio" name="q3" value="c"> Volumes</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>4. The `image:` key inside a service definition specifies what?</p>
+                            <label><input type="radio" name="q4" value="a"> The Docker image to use for creating the container.</label>
+                            <label><input type="radio" name="q4" value="b"> A picture to display in Docker Desktop.</label>
+                            <label><input type="radio" name="q4" value="c"> The operating system of the container.</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>5. What does the `volumes:` key in Docker Compose generally do?</p>
+                            <label><input type="radio" name="q5" value="a"> Adjusts the container's speaker volume.</label>
+                            <label><input type="radio" name="q5" value="b"> Persists data generated by containers, so it's not lost when a container is removed.</label>
+                            <label><input type="radio" name="q5" value="c"> Defines how much RAM a service can use.</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>6. In our example, what is the name we chose for our Apache web server service?</p>
+                            <label><input type="radio" name="q6" value="a"> httpd</label>
+                            <label><input type="radio" name="q6" value="b"> apache</label>
+                            <label><input type="radio" name="q6" value="c"> webserver</label>
+                        </div>
+
+                        <div class="question">
+                            <p>7. To add a new service, you add a new key under the top-level `________` key.</p>
+                            <label><input type="radio" name="q7" value="a"> containers</label>
+                            <label><input type="radio" name="q7" value="b"> services</label>
+                            <label><input type="radio" name="q7" value="c"> applications</label>
+                        </div>
+
+                        <div class="question">
+                            <p>8. The `depends_on` key (seen in the `n8n` service) is used to...</p>
+                            <label><input type="radio" name="q8" value="a"> Control startup and shutdown order of services.</label>
+                            <label><input type="radio" name="q8" value="b"> Specify which service is more important.</label>
+                            <label><input type="radio" name="q8" value="c"> Link the billing for two services together.</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>9. If you mis-align the indentation for `webserver:`, what will most likely happen?</p>
+                            <label><input type="radio" name="q9" value="a"> Docker will automatically fix it.</label>
+                            <label><input type="radio" name="q9" value="b"> Docker Compose will fail with a parsing error.</label>
+                            <label><input type="radio" name="q9" value="c"> The service will run, but with default settings.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>10. The name `webserver` is...</p>
+                            <label><input type="radio" name="q10" value="a"> A required name for all web servers.</label>
+                            <label><input type="radio" name="q10" value="b"> An arbitrary name we chose for the service within Docker Compose.</label>
+                            <label><input type="radio" name="q10" value="c"> The hostname that will be visible on the public internet.</label>
+                        </div>
+                        
+                        <button type="submit" class="submit-quiz">Check Answers & Proceed</button>
+                        <div id="quiz-2-feedback" class="quiz-feedback" style="display: none;"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- STAGE 3: RUNNING AND CHECKING -->
+        <div id="stage-3" class="stage" style="display: none;">
+            <button class="accordion" data-stage="3">Stage 3: Run the Stack and Check Container Status</button>
+            <div class="panel">
+                <div class="panel-content">
+                    <h2>Bringing Your Services to Life</h2>
+                    <p>Now that you've updated the <code>docker-compose.yaml</code> file, you need to tell Docker to apply these changes. The command to do this is <code>docker-compose up</code>. This command reads your YAML file, creates and starts any services that aren't running, and re-creates services whose configuration has changed.</p>
+                    <p>We'll add the <code>-d</code> flag, which stands for "detached" mode. This runs the containers in the background, so your PowerShell terminal is free to use for other commands.</p>
+
+                    <h3>Your Task: Start the Containers</h3>
+                    <p>1. Open PowerShell on your Windows machine.<br>
+                       2. Navigate to the directory where your <code>docker-compose.yaml</code> file is located.<br>
+                       3. Run the following command:</p>
+<pre><code>docker-compose up -d</code></pre>
+                    <p>You will see output indicating that Docker is "pulling" the `httpd` image (if you don't have it locally) and then creating and starting the `webserver` container.</p>
+                    
+                    <h3>Check if it's Running</h3>
+                    <p>To see all the containers that are currently running from your compose file, use the <code>docker ps</code> command (ps stands for "process status").</p>
+<pre><code>docker ps</code></pre>
+                    <p>You should see a list of your running containers, including `n8n`, `postgres`, and your new `webserver` container. Look for the `STATUS` column to confirm it says "Up".</p>
+
+                    <div class="hint-container">
+                        <button class="hint-button" onclick="toggleHint(this, 3)">Show Hint</button>
+                        <div class="hint-text" id="hint-3">
+                            If the `docker-compose up -d` command gives an error, double-check the indentation in your YAML file from Stage 2. If `docker ps` doesn't show your `webserver` container, the `up` command may have failed.
+                        </div>
+                    </div>
+
+                    <form id="quiz-3" class="quiz-form">
+                        <h3>Stage 3 Quiz: Managing Containers</h3>
+                        
+                        <div class="question">
+                            <p>1. What command reads your `docker-compose.yaml` and starts the defined services?</p>
+                            <label><input type="radio" name="q1" value="a"> `docker start all`</label>
+                            <label><input type="radio" name="q1" value="b"> `docker-compose up`</label>
+                            <label><input type="radio" name="q1" value="c"> `docker run compose`</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>2. What does the `-d` flag in `docker-compose up -d` mean?</p>
+                            <label><input type="radio" name="q2" value="a"> "Delete" - deletes old containers before starting.</label>
+                            <label><input type="radio" name="q2" value="b"> "Detached" - runs containers in the background.</label>
+                            <label><input type="radio" name="q2" value="c"> "Debug" - provides extra logging information.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>3. The command to list all currently running containers is:</p>
+                            <label><input type="radio" name="q3" value="a"> `docker list`</label>
+                            <label><input type="radio" name="q3" value="b"> `docker status`</label>
+                            <label><input type="radio" name="q3" value="c"> `docker ps`</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>4. If a container is running successfully, what would you expect to see in the `STATUS` column of `docker ps`?</p>
+                            <label><input type="radio" name="q4" value="a"> A message containing "Up".</label>
+                            <label><input type="radio" name="q4" value="b"> The word "Running".</label>
+                            <label><input type="radio" name="q4" value="c"> A checkmark icon.</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>5. What happens if you run `docker-compose up -d` when the `httpd` image does not exist on your machine?</p>
+                            <label><input type="radio" name="q5" value="a"> The command fails with an "image not found" error.</label>
+                            <label><input type="radio" name="q5" value="b"> Docker automatically pulls the image from Docker Hub first, then starts the container.</label>
+                            <label><input type="radio" name="q5" value="c"> It prompts you to manually pull the image.</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>6. What is the command to stop and remove all containers defined in your `docker-compose.yaml`?</p>
+                            <label><input type="radio" name="q6" value="a"> `docker-compose stop`</label>
+                            <label><input type="radio" name="q6" value="b"> `docker-compose rm -f`</label>
+                            <label><input type="radio" name="q6" value="c"> `docker-compose down`</label>
+                        </div>
+
+                        <div class="question">
+                            <p>7. If you change your `docker-compose.yaml` file (e.g., change an image version), what should you do?</p>
+                            <label><input type="radio" name="q7" value="a"> Restart your computer.</label>
+                            <label><input type="radio" name="q7" value="b"> Run `docker-compose up -d` again to apply the changes.</label>
+                            <label><input type="radio" name="q7" value="c"> Manually delete the container and then run `docker-compose up -d`.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>8. The `docker ps -a` command will show you:</p>
+                            <label><input type="radio" name="q8" value="a"> Only running containers.</label>
+                            <label><input type="radio" name="q8" value="b"> All containers, including ones that have stopped or exited.</label>
+                            <label><input type="radio" name="q8" value="c"> All images on your machine.</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>9. Where must you be in your PowerShell terminal to run `docker-compose up`?</p>
+                            <label><input type="radio" name="q9" value="a"> Any directory is fine.</label>
+                            <label><input type="radio" name="q9" value="b"> In the same directory as the `docker-compose.yaml` file.</label>
+                            <label><input type="radio" name="q9" value="c"> In your user's home directory (`C:\Users\YourUser`).</label>
+                        </div>
+
+                        <div class="question">
+                            <p>10. What does the `NAMES` column in `docker ps` show?</p>
+                            <label><input type="radio" name="q10" value="a"> The name of the image.</label>
+                            <label><input type="radio" name="q10" value="b"> The name given to the running container, often generated by Docker Compose.</label>
+                            <label><input type="radio" name="q10" value="c"> The name of the person who created the image.</label>
+                        </div>
+                        
+                        <button type="submit" class="submit-quiz">Check Answers & Proceed</button>
+                        <div id="quiz-3-feedback" class="quiz-feedback" style="display: none;"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- STAGE 4: CHECKING LOGS -->
+        <div id="stage-4" class="stage" style="display: none;">
+            <button class="accordion" data-stage="4">Stage 4: Investigate with Docker Logs</button>
+            <div class="panel">
+                <div class="panel-content">
+                    <h2>Peeking Inside the Container</h2>
+                    <p>Your container is running, but what is it actually *doing*? Every container has a standard output stream, just like a regular application. We can view this stream using the <code>docker logs</code> command. This is your number one tool for debugging. If a container isn't starting or is behaving unexpectedly, the logs are the first place you should look.</p>
+                    
+                    <h3>Your Task: View the Web Server Logs</h3>
+                    <p>1. First, you need the name of your `webserver` container. Run <code>docker ps</code> again and look at the `NAMES` column. It will be something like <code>your-project-name_webserver_1</code>.<br>
+                       2. Now, use that name with the <code>docker logs</code> command:</p>
+<pre><code># Replace "your-project-name_webserver_1" with the actual name from docker ps
+docker logs your-project-name_webserver_1</code></pre>
+                    <p>You should see output from the Apache server, indicating that it has started successfully. It might look something like this:</p>
+<pre><code>AH00558: httpd: Could not reliably determine the server's fully qualified domain name...
+...
+[... notice] [pid ...] AH00094: Command line: 'httpd -D FOREGROUND'
+</code></pre>
+                    <p>This confirms the application *inside* the container is running as expected.</p>
+
+                    <div class="hint-container">
+                        <button class="hint-button" onclick="toggleHint(this, 4)">Show Hint</button>
+                        <div class="hint-text" id="hint-4">
+                            You can use the Container ID from `docker ps` instead of the full name. It's shorter! For example: `docker logs 3a8d7b3dcb89`. Also, you can type the first few unique characters of the name or ID and press Tab for autocompletion in PowerShell.
+                        </div>
+                    </div>
+
+                    <form id="quiz-4" class="quiz-form">
+                        <h3>Stage 4 Quiz: Reading the Signs</h3>
+                        
+                        <div class="question">
+                            <p>1. What is the primary command to view the output of a running container?</p>
+                            <label><input type="radio" name="q1" value="a"> `docker output [container_name]`</label>
+                            <label><input type="radio" name="q1" value="b"> `docker-compose logs [service_name]`</or `docker logs [container_name]`></label>
+                            <label><input type="radio" name="q1" value="c"> `docker console [container_name]`</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>2. Why are logs important in Docker?</p>
+                            <label><input type="radio" name="q2" value="a"> They are mainly for tracking billing and usage.</label>
+                            <label><input type="radio" name="q2" value="b"> They are the primary tool for debugging and understanding what an application inside a container is doing.</label>
+                            <label><input type="radio" name="q2" value="c"> They are required by law for all applications.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>3. To use `docker logs`, you need the container's ________ or ________.</p>
+                            <label><input type="radio" name="q3" value="a"> Image Name or Tag</label>
+                            <label><input type="radio" name="q3" value="b"> IP Address or Mac Address</label>
+                            <label><input type="radio" name="q3" value="c"> Name or ID</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>4. How can you find a container's specific Name or ID?</p>
+                            <label><input type="radio" name="q4" value="a"> By guessing it.</label>
+                            <label><input type="radio" name="q4" value="b"> By running `docker ps`.</label>
+                            <label><input type="radio" name="q4" value="c"> It's written in the `docker-compose.yaml` file.</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>5. What does the `-f` flag do in `docker logs -f [container_name]`?</p>
+                            <label><input type="radio" name="q5" value="a"> "Follow" - It streams the logs live, showing new output as it happens.</label>
+                            <label><input type="radio" name="q5" value="b"> "Force" - It forces the container to generate new logs.</label>
+                            <label><input type="radio" name="q5" value="c"> "Format" - It formats the logs into a JSON structure.</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>6. If a container starts and then immediately stops, how would you investigate?</p>
+                            <label><input type="radio" name="q6" a`docker-compose up`> Run  again and hope it works.</label>
+                            <label><input type="radio" name="q6" value="b"> Run `docker logs [container_name]` on the stopped container to see the error message it produced before exiting.</label>
+                            <label><input type="radio" name="q6" value="c"> Delete the image and pull it again.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>7. The container name is automatically generated by Docker Compose. What is its typical format?</p>
+                            <label><input type="radio" name="q7" value="a"> `service-name_project-name_1`</label>
+                            <label><input type="radio" name="q7" value="b"> `project-name_service-name_1`</label>
+                            <label><input type="radio" name="q7" value="c"> `service-name_1_project-name`</label>
+                        </div>
+
+                        <div class="question">
+                            <p>8. What command lets you see the logs for ALL services in your compose file at once?</p>
+                            <label><input type="radio" name="q8" value="a"> `docker logs --all`</label>
+                            <label><input type="radio" name="q8" value="b"> `docker-compose logs`</label>
+                            <label><input type="radio" name="q8" value="c"> `docker ps --logs`</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>9. The message `httpd -D FOREGROUND` in the logs is a good sign because it means...</p>
+                            <label><input type="radio" name="q9" value="a"> The server is waiting for a file to be uploaded.</label>
+                            <label><input type="radio" name="q9" value="b"> The main server process has started and is running.</label>
+                            <label><input type="radio" name="q9" value="c"> The server has encountered an error and is in the foreground for debugging.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>10. If the logs are empty, what might that indicate?</p>
+                            <label><input type="radio" name="q10" value="a"> The application inside the container hasn't started or has crashed without an error message.</label>
+                            <label><input type="radio" name="q10" value="b"> Everything is working perfectly.</label>
+                            <label><input type="radio" name="q10" value="c"> The `docker logs` command is broken.</label>
+                        </div>
+                        
+                        <button type="submit" class="submit-quiz">Check Answers & Proceed</button>
+                        <div id="quiz-4-feedback" class="quiz-feedback" style="display: none;"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- STAGE 5: THE CONNECTION PROBLEM -->
+        <div id="stage-5" class="stage" style="display: none;">
+            <button class="accordion" data-stage="5">Stage 5: The "Connection Refused" Problem (Networking Part 1)</button>
+            <div class="panel">
+                <div class="panel-content">
+                    <h2>Container Isolation: A Double-Edged Sword</h2>
+                    <p>One of Docker's greatest features is <strong>network isolation</strong>. By default, a container is like its own separate computer with its own private network. It can talk to other containers in the same Docker network (which Docker Compose sets up for you), but the outside world—including your own Windows machine (the "host")—cannot see inside.</p>
+                    <p>The Apache server inside your `webserver` container is listening for traffic on its own Port 80. A <strong>port</strong> is like a numbered door on a computer for network communication. HTTP web traffic traditionally uses Port 80.</p>
+                    <p>However, your Windows machine (the "host") has its own set of ports, and it knows nothing about the container's private Port 80. They are completely separate.</p>
+
+                    <h3>Your Task: See the Failure</h3>
+                    <p>1. Open your web browser.<br>
+                       2. Try to navigate to <a href="http://localhost:80" target="_blank">http://localhost:80</a> or <a href="http://localhost:8080" target="_blank">http://localhost:8080</a>.<br>
+                       3. You will get an error like "This site can’t be reached" or "Connection Refused".</p>
+                    <p><strong>This is expected!</strong> You are knocking on door 80 or 8080 on your Windows machine (`localhost`), but nothing is listening there. We haven't built a bridge between your host machine and the container yet. This "bridge" is called <strong>port mapping</strong> or <strong>port forwarding</strong>.</p>
+                    <p><strong>Analogy:</strong> Your computer is an office building (`localhost`). The container is a secure, soundproof room inside (`webserver` container). The Apache server is a person in that room waiting for a call on extension `80`. If you dial the building's main number and ask for extension `80`, the front desk (Docker) has no idea you mean the person inside that specific room. You need to explicitly tell the front desk: "Any calls that come to the building's special line `8080`, please forward them to the person in the `webserver` room at their extension `80`."</p>
+
+                    <div class="hint-container">
+                        <button class="hint-button" onclick="toggleHint(this, 5)">Show Hint</button>
+                        <div class="hint-text" id="hint-5">
+                            The key takeaway is that `localhost` on your Windows browser is different from `localhost` inside the container. They are on separate, isolated networks by default. The failure to connect is a core concept, not a mistake in your setup so far.
+                        </div>
+                    </div>
+
+                    <form id="quiz-5" class="quiz-form">
+                        <h3>Stage 5 Quiz: Understanding Container Networks</h3>
+                        
+                        <div class="question">
+                            <p>1. By default, a container's network is ________ from the host machine's network.</p>
+                            <label><input type="radio" name="q1" value="a"> a direct copy</label>
+                            <label><input type="radio" name="q1" value="b"> isolated</label>
+                            <label><input type="radio" name="q1" value="c"> slower</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>2. What is a "port" in networking terms?</p>
+                            <label><input type="radio" name="q2" value="a"> A physical USB or HDMI port on your computer.</label>
+                            <label><input type="radio" name="q2" value="b"> A specific endpoint for network communication, identified by a number.</label>
+                            <label><input type="radio" name="q2" value="c"> A brand of wine from Portugal.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>3. What is the standard, default port for HTTP web traffic?</p>
+                            <label><input type="radio" name="q3" value="a"> 22</label>
+                            <label><input type="radio" name="q3" value="b"> 443</label>
+                            <label><input type="radio" name="q3" value="c"> 80</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>4. Why did visiting `localhost:8080` in your browser fail?</p>
+                            <label><input type="radio" name="q4" value="a"> Because the Apache server in the container is broken.</label>
+                            <label><input type="radio" name="q4" value="b"> Because there is no "bridge" or "mapping" from port 8080 on the host to the port inside the container.</label>
+                            <label><input type="radio" name="q4" value="c"> Because `localhost` is the wrong address; you need to use an IP address.</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>5. The term for connecting a port on the host machine to a port inside a container is called...</p>
+                            <label><input type="radio" name="q5" value="a"> Port linking</label>
+                            <label><input type="radio" name="q5" value="b"> Port tunneling</label>
+                            <label><input type="radio" name="q5" value="c"> Port mapping (or forwarding)</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>6. In our analogy, what does "the person waiting for a call on extension 80" represent?</p>
+                            <label><input type="radio" name="q6" value="a"> The Apache server process listening on port 80 inside the container.</label>
+                            <label><input type="radio" name="q6" value="b"> The Docker Desktop application.</label>
+                            <label><input type="radio" name="q6" value="c"> Your web browser.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>7. The "host" machine refers to...</p>
+                            <label><input type="radio" name="q7" value="a"> The container running the web server.</label>
+                            <label><input type="radio" name="q7" value="b"> Your physical (or virtual) Windows machine where Docker is installed.</label>
+                            <label><input type="radio" name="q7" value="c"> The Docker Hub server.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>8. Network isolation is a feature primarily for...</p>
+                            <label><input type="radio" name="q8" value="a"> Simplicity</label>
+                            <label><input type="radio" name="q8" value="b"> Performance</label>
+                            <label><input type="radio" name="q8" value="c"> Security and avoiding port conflicts</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>9. Can the `n8n` container and the `postgres` container talk to each other without port mapping?</p>
+                            <label><input type="radio" name="q9" value="a"> Yes, because Docker Compose puts them on the same shared private network by default.</label>
+                            <label><input type="radio" name="q9" value="b"> No, every container is completely isolated from everything.</label>
+                            <label><input type="radio" name="q9" value="c"> Only if they are running the same operating system.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>10. The goal of the next stage will be to...</p>
+                            <label><input type="radio" name="q10" value="a"> Re-install Apache.</label>
+                            <label><input type="radio" name="q10" value="b"> Tell Docker to create a mapping between a host port and the container's port 80.</label>
+                            <label><input type="radio" name="q10" value="c"> Change the network card settings in Windows.</label>
+                        </div>
+                        
+                        <button type="submit" class="submit-quiz">Check Answers & Proceed</button>
+                        <div id="quiz-5-feedback" class="quiz-feedback" style="display: none;"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- STAGE 6: SOLVING WITH PORT MAPPING -->
+        <div id="stage-6" class="stage" style="display: none;">
+            <button class="accordion" data-stage="6">Stage 6: Success! Solving with Port Mapping (Networking Part 2)</button>
+            <div class="panel">
+                <div class="panel-content">
+                    <h2>Building the Bridge: The `ports` Directive</h2>
+                    <p>We're now ready to solve the connection problem. We'll tell Docker to map a port on our host machine to the port inside the `webserver` container. We do this in the <code>docker-compose.yaml</code> file using the <code>ports</code> key.</p>
+                    <p>The format is a list of strings, with each string being <code>"HOST_PORT:CONTAINER_PORT"</code>.</p>
+                    <ul>
+                        <li><code>HOST_PORT</code>: The port you will access on your host machine (e.g., in your browser). We'll use <code>8080</code>.</li>
+                        <li><code>CONTAINER_PORT</code>: The port the application is listening on *inside* the container. For Apache/httpd, this is <code>80</code>.</li>
+                    </ul>
+                    <p>So, our mapping will be <code>"8080:80"</code>.</p>
+                    
+                    <h3>Your Task: Update, Recreate, and Test</h3>
+                    <p>1. Open your <code>docker-compose.yaml</code> file again.<br>
+                       2. Modify the <code>webserver</code> service to include the port mapping:</p>
+<pre><code># ... inside your docker-compose.yaml
+
+  webserver:
+    image: httpd:latest
+    <mark>ports:
+      - "8080:80"</mark>
+
+# ... rest of the file
+</code></pre>
+                    <p>3. <strong>Important:</strong> Because you've changed the configuration, you need to stop the old container and create a new one with the new settings. The `docker-compose up -d` command does this automatically for you. Open PowerShell in the correct directory and run:</p>
+<pre><code>docker-compose up -d</code></pre>
+                    <p>You will see that it "recreates" the `webserver` container.</p>
+                    <p>4. <strong>The Moment of Truth:</strong> Open your web browser and navigate to <a href="http://localhost:8080" target="_blank">http://localhost:8080</a>.</p>
+                    <p>You should now see a simple page with the text: <strong>"It works!"</strong></p>
+                    <p>Congratulations! You have successfully added a new service to your stack and made it accessible from your host machine by mapping ports.</p>
+
+                    <div class="hint-container">
+                        <button class="hint-button" onclick="toggleHint(this, 6)">Show Hint</button>
+                        <div class="hint-text" id="hint-6">
+                           Make sure the `ports:` line is indented correctly under `webserver`, and the `- "8080:80"` line is indented under `ports:`. If `docker-compose up -d` gives an error, it's almost certainly a YAML indentation issue. If it still doesn't work, `docker-compose down` followed by `docker-compose up -d` can sometimes clear up stale network settings.
+                        </div>
+                    </div>
+
+                    <form id="quiz-6" class="quiz-form">
+                        <h3>Stage 6 Quiz: Final Check</h3>
+                        
+                        <div class="question">
+                            <p>1. In which file do you define port mappings for Docker Compose?</p>
+                            <label><input type="radio" name="q1" value="a"> The Dockerfile</label>
+                            <label><input type="radio" name="q1" value="b"> `docker-compose.yaml`</label>
+                            <label><input type="radio" name="q1" value="c"> A separate `ports.txt` file</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>2. What is the correct syntax for the `ports` mapping?</p>
+                            <label><input type="radio" name="q2" value="a"> `CONTAINER_PORT:HOST_PORT`</label>
+                            <label><input type="radio" name="q2" value="b"> `HOST_PORT=CONTAINER_PORT`</label>
+                            <label><input type="radio" name="q2" value="c"> `"HOST_PORT:CONTAINER_PORT"`</label>
+                        </div>
+
+                        <div class="question">
+                            <p>3. In our mapping `"8080:80"`, which port do you type into your web browser?</p>
+                            <label><input type="radio" name="q3" value="a"> 80</label>
+                            <label><input type="radio" name="q3" value="b"> 8080</label>
+                            <label><input type="radio" name="q3" value="c"> Both will work.</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>4. In our mapping `"8080:80"`, which port is the Apache server listening on *inside* the container?</p>
+                            <label><input type="radio" name="q4" value="a"> 80</label>
+                            <label><input type="radio" name="q4" value="b"> 8080</label>
+                            <label><input type="radio" name="q4" value="c"> Neither, it listens on all ports.</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>5. After adding the `ports` key to your YAML file, what must you do?</p>
+                            <label><input type="radio" name="q5" value="a"> Restart your computer.</label>
+                            <label><input type="radio" name="q5" value="b"> Run `docker-compose up -d` to apply the changes and recreate the container.</label>
+                            <label><input type="radio" name="q5" value="c"> The changes apply automatically without any commands.</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>6. Why did we choose `8080` for the host port?</p>
+                            <label><input type="radio" name="q6" value="a"> It's a required number for all Docker web apps.</label>
+                            <label><input type="radio" name="q6" value="b"> It's a common alternative for web traffic, and it's less likely to be already in use on our host machine than port 80.</label>
+                            <label><input type="radio" name="q6" value="c"> It's the year Apache was invented.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>7. If you run `docker ps` after this final step, what new information will you see in the `PORTS` column for your webserver container?</p>
+                            <label><input type="radio" name="q7" value="a"> `80/tcp`</label>
+                            <label><input type="radio" name="q7" value="b"> The column will be empty.</label>
+                            <label><input type="radio" name="q7" value="c"> Something like `0.0.0.0:8080->80/tcp`</label>
+                        </div>
+
+                        <div class="question">
+                            <p>8. What command fully stops and removes the containers, networks, and volumes defined in the compose file?</p>
+                            <label><input type="radio" name="q8" value="a"> `docker-compose down`</label>
+                            <label><input type="radio" name="q8" value="b"> `docker-compose halt`</label>
+                            <label><input type="radio" name="q8" value="c"> `docker system prune -a`</label>
+                        </div>
+                        
+                        <div class="question">
+                            <p>9. Could you map another service to host port `8080` at the same time?</p>
+                            <label><input type="radio" name="q9" value="a"> Yes, Docker allows multiple services on the same host port.</label>
+                            <label><input type="radio" name="q9" value="b"> No, a host port can only be mapped to one container at a time.</label>
+                            <label><input type="radio" name="q9" value="c"> Only if the containers are running different applications.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>10. You have now successfully...</p>
+                            <label><input type="radio" name="q10" value="a"> Hacked into the mainframe.</label>
+                            <label><input type="radio" name="q10" value="b"> Containerized a web server, configured it with Docker Compose, and exposed it to your host machine via port mapping.</label>
+                            <label><input type="radio" name="q10" value="c"> Installed Apache directly on your Windows machine.</label>
+                        </div>
+                        
+                        <button type="submit" class="submit-quiz">Check Answers & Finish</button>
+                        <div id="quiz-6-feedback" class="quiz-feedback" style="display: none;"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            let currentStage = 1;
+            const totalStages = 6;
+            
+            const correctAnswers = {
+                1: { q1: 'b', q2: 'c', q3: 'b', q4: 'b', q5: 'c', q6: 'b', q7: 'b', q8: 'b', q9: 'c', q10: 'c' },
+                2: { q1: 'c', q2: 'a', q3: 'b', q4: 'a', q5: 'b', q6: 'c', q7: 'b', q8: 'a', q9: 'b', q10: 'b' },
+                3: { q1: 'b', q2: 'b', q3: 'c', q4: 'a', q5: 'b', q6: 'c', q7: 'b', q8: 'b', q9: 'b', q10: 'b' },
+                4: { q1: 'b', q2: 'b', q3: 'c', q4: 'b', q5: 'a', q6: 'b', q7: 'b', q8: 'b', q9: 'b', q10: 'a' },
+                5: { q1: 'b', q2: 'b', q3: 'c', q4: 'b', q5: 'c', q6: 'a', q7: 'b', q8: 'c', q9: 'a', q10: 'b' },
+                6: { q1: 'b', q2: 'c', q3: 'b', q4: 'a', q5: 'b', q6: 'b', q7: 'c', q8: 'a', q9: 'b', q10: 'b' }
+            };
+
+            function updatePanelHeight(element) {
+                const panel = element.closest('.panel');
+                if (!panel) return;
+                const accordion = panel.previousElementSibling;
+                if (accordion.classList.contains('active')) {
+                    panel.style.maxHeight = panel.scrollHeight + "px";
+                }
+            }
+
+            const accordions = document.querySelectorAll('.accordion');
+            accordions.forEach(acc => {
+                acc.addEventListener('click', function() {
+                    const stageNum = parseInt(this.dataset.stage);
+                    if (stageNum > currentStage) {
+                        return;
+                    }
+
+                    this.classList.toggle('active');
+                    const panel = this.nextElementSibling;
+                    if (panel.style.maxHeight) {
+                        panel.style.maxHeight = null;
+                        panel.style.padding = "0 20px";
+                    } else {
+                        panel.style.maxHeight = panel.scrollHeight + "px";
+                        panel.style.padding = "0 20px";
+                    }
+                });
+            });
+            
+            window.toggleHint = function(buttonElement, stageNum) {
+                const hintText = document.getElementById(`hint-${stageNum}`);
+                hintText.style.display = hintText.style.display === 'block' ? 'none' : 'block';
+                updatePanelHeight(buttonElement);
+            }
+
+            const quizForms = document.querySelectorAll('.quiz-form');
+            quizForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const stageNum = parseInt(this.id.split('-')[1]);
+                    const answers = correctAnswers[stageNum];
+                    const formData = new FormData(this);
+                    
+                    let score = 0;
+                    let totalQuestions = 0;
+
+                    // **NEW**: Logic to mark individual questions
+                    for (const key in answers) { // key is "q1", "q2", etc.
+                        totalQuestions++;
+                        const userAnswer = formData.get(key);
+                        const correctAnswer = answers[key];
+                        
+                        const allRadiosForQuestion = document.querySelectorAll(`input[name="${key}"]`);
+
+                        allRadiosForQuestion.forEach(radio => {
+                            const label = radio.parentElement;
+                            // Reset previous styles
+                            label.classList.remove('correct-answer', 'incorrect-answer', 'reveal-correct');
+
+                            if (radio.value === correctAnswer) {
+                                // This is the correct option.
+                                if (userAnswer === correctAnswer) {
+                                    // And the user selected it. Mark it as correct.
+                                    label.classList.add('correct-answer');
+                                } else {
+                                    // The user selected something else, so reveal this one.
+                                    // label.classList.add('reveal-correct');
+                                }
+                            } else if (radio.checked) {
+                                // If this radio is checked and it's not the correct answer, mark it incorrect.
+                                label.classList.add('incorrect-answer');
+                            }
+                        });
+
+                        if (userAnswer === correctAnswer) {
+                            score++;
+                        }
+                    }
+
+                    const feedbackEl = document.getElementById(`quiz-${stageNum}-feedback`);
+                    feedbackEl.style.display = 'block';
+                    updatePanelHeight(feedbackEl);
+
+                    if (score === totalQuestions) {
+                        feedbackEl.textContent = `Perfect! You scored ${score}/${totalQuestions}. Unlocking the next stage...`;
+                        feedbackEl.className = 'quiz-feedback success';
+                        
+                        const currentAccordion = document.querySelector(`.accordion[data-stage="${stageNum}"]`);
+                        
+                        if (stageNum < totalStages) {
+                            currentStage++;
+                            setTimeout(() => {
+                                currentAccordion.classList.remove('active');
+                                currentAccordion.classList.add('completed');
+                                currentAccordion.nextElementSibling.style.maxHeight = null;
+                                showStage(currentStage);
+                            }, 2000);
+                        } else {
+                           feedbackEl.textContent += " Congratulations, you have completed the tutorial!";
+                           currentAccordion.classList.add('completed');
+                        }
+
+                    } else {
+                        feedbackEl.textContent = `Not quite. You scored ${score}/${totalQuestions}. Please review your answers and try again.`;
+                        feedbackEl.className = 'quiz-feedback error';
+                    }
+                });
+            });
+
+            function showStage(stageNum) {
+                const stageToShow = document.getElementById(`stage-${stageNum}`);
+                if (stageToShow) {
+                    stageToShow.style.display = 'block';
+                    const accordion = stageToShow.querySelector('.accordion');
+                    const panel = accordion.nextElementSibling;
+                    accordion.classList.add('active');
+                    setTimeout(() => {
+                        panel.style.maxHeight = panel.scrollHeight + "px";
+                    }, 50);
+                }
+            }
+
+            showStage(currentStage);
+
+        });
+    </script>
+
+</body>
+</html>
