@@ -3,380 +3,367 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Docker & Automation Tutorials - Learn by Doing</title>
+    <title>Docker Labs - Interactive Tutorials</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        /* --- General Styling --- */
+        :root {
+            --text-dark: #333333;
+            --text-light: #888888;
+            --bg-white: #ffffff;
+            --bg-light-gray: #f9f9f9;
+            --border-color: #eeeeee;
+            --font-main: 'Montserrat', sans-serif;
+            --font-logo: 'Pacifico', cursive;
+            --primary-color: #007bff;
+        }
+
+        /* --- General & Reset --- */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f4f7f9;
-            color: #333;
+            font-family: var(--font-main);
+            background-color: var(--bg-white);
+            color: var(--text-dark);
             line-height: 1.6;
             margin: 0;
-            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 20px;
         }
 
-        header {
-            text-align: center;
-            padding: 40px 20px;
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 40px;
+        a {
+            text-decoration: none;
+            color: inherit;
         }
 
-        h1 {
-            color: #0d47a1;
-            font-size: 2.5em;
-            margin-bottom: 10px;
+        /* --- Header --- */
+        .main-header {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .tagline {
-            color: #666;
-            font-size: 1.2em;
-            margin-bottom: 20px;
-        }
-
-        .author-note {
-            background-color: #e3f2fd;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 20px auto;
-            max-width: 600px;
-            text-align: center;
-        }
-
-        /* --- Tutorial Cards --- */
-        .tutorials-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .tutorial-card {
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .tutorial-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .tutorial-card h2 {
-            color: #1976d2;
-            margin-bottom: 15px;
-            font-size: 1.5em;
-        }
-
-        .difficulty-badge {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .beginner {
-            background-color: #4caf50;
-            color: white;
-        }
-
-        .intermediate {
-            background-color: #ff9800;
-            color: white;
-        }
-
-        .tutorial-description {
-            color: #666;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-
-        .tutorial-topics {
-            margin-bottom: 20px;
-        }
-
-        .tutorial-topics h3 {
-            font-size: 1em;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .tutorial-topics ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .tutorial-topics li {
-            padding: 5px 0;
-            padding-left: 20px;
-            position: relative;
-        }
-
-        .tutorial-topics li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #4caf50;
-            font-weight: bold;
-        }
-
-        .tutorial-stats {
+        .top-bar {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 20px;
-            padding: 15px;
-            background-color: #f5f5f5;
-            border-radius: 5px;
+            align-items: center;
+            padding: 0 20px;
         }
 
-        .stat {
+        .social-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-icons a i {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            transition: color 0.3s ease;
+        }
+        
+        .social-icons a:hover i {
+            color: var(--text-dark);
+        }
+
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .main-nav a {
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s ease, color 0.3s ease;
+        }
+
+        .main-nav a:hover, .main-nav a.active {
+            border-bottom-color: var(--text-dark);
+            color: var(--text-dark);
+        }
+        
+        .mobile-menu-toggle {
+            display: none;
+            cursor: pointer;
+        }
+        
+        .mobile-menu-toggle i {
+            font-size: 1.8rem;
+        }
+
+        .logo-container {
             text-align: center;
+            padding: 50px 20px 30px;
         }
 
-        .stat-number {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #1976d2;
+        .logo {
+            font-family: var(--font-logo);
+            font-size: 4.5rem;
+            font-weight: normal;
         }
 
-        .stat-label {
-            font-size: 0.9em;
-            color: #666;
+        /* --- Gallery Grid --- */
+        .gallery-grid {
+            column-count: 2;
+            column-gap: 25px;
+            padding: 0 20px;
         }
 
-        .start-button {
-            display: block;
+        .gallery-card {
+            display: inline-block;
             width: 100%;
-            padding: 15px;
-            background-color: #1976d2;
-            color: white;
+            margin-bottom: 25px;
+            break-inside: avoid;
+        }
+        
+        .gallery-card a {
+            display: block;
+        }
+        
+        .gallery-card.under-construction {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .gallery-card.under-construction:hover img {
+             opacity: 1;
+        }
+        
+        .gallery-card.under-construction a {
+             pointer-events: none;
+        }
+
+        .gallery-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 4px;
+            transition: opacity 0.3s ease;
+        }
+        
+        .gallery-card:not(.under-construction):hover img {
+            opacity: 0.85;
+        }
+        
+        .gallery-info {
+            padding: 20px 5px;
+        }
+        
+        .gallery-info h3 {
+            margin: 0 0 8px 0;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        
+        .gallery-info .description {
+            margin: 0 0 10px 0;
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+        
+        .gallery-info .difficulty {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-dark);
+        }
+        
+        .difficulty.beginner { color: #28a745; }
+        .difficulty.intermediate { color: #ffc107; }
+
+        /* --- Other Sections --- */
+        .secondary-section {
+            background-color: var(--bg-light-gray);
+            padding: 50px 40px;
+            border-radius: 6px;
             text-align: center;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 1.1em;
+            margin: 40px 20px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .secondary-section h2 {
+            margin: 0 0 10px 0;
+            font-size: 2rem;
+        }
+        
+        .secondary-section p {
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            color: var(--text-light);
+        }
+        
+        .subscribe-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background-color: var(--text-dark);
+            color: var(--bg-white);
+            border-radius: 4px;
+            font-weight: 700;
             transition: background-color 0.3s ease;
         }
-
-        .start-button:hover {
-            background-color: #1565c0;
-        }
-
-        /* --- Coming Soon Section --- */
-        .coming-soon {
-            background-color: #fff3e0;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .coming-soon h2 {
-            color: #f57c00;
-            margin-bottom: 20px;
-        }
-
-        .coming-soon-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .coming-soon-item {
-            padding: 15px;
-            background-color: white;
-            border-radius: 5px;
-            border: 2px dashed #ffcc80;
+        
+        .subscribe-button:hover {
+            background-color: #000;
         }
 
         /* --- Footer --- */
-        footer {
+        .main-footer {
             text-align: center;
             padding: 40px 20px;
-            color: #666;
+            margin-top: 30px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-light);
+            font-size: 0.9rem;
         }
-
-        footer a {
-            color: #1976d2;
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        .subscribe-cta {
-            background-color: #2e7d32;
-            color: white;
-            padding: 20px 30px;
-            border-radius: 10px;
-            margin: 40px auto;
-            max-width: 600px;
-            text-align: center;
-        }
-
-        .subscribe-cta h3 {
-            margin-bottom: 10px;
-        }
-
-        .subscribe-cta a {
-            color: #81c784;
+        
+        .main-footer a {
+            color: var(--text-dark);
             font-weight: bold;
         }
 
         /* --- Responsive --- */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2em;
-            }
-            
-            .tutorials-grid {
-                grid-template-columns: 1fr;
+        @media (max-width: 992px) {
+            .gallery-grid {
+                column-count: 2;
             }
         }
+        
+        @media (max-width: 768px) {
+            .main-nav {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 65px;
+                left: 0;
+                width: 100%;
+                background: var(--bg-white);
+                padding: 20px 0;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+                z-index: 1000;
+            }
+            
+            .main-nav.active {
+                display: flex;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .logo {
+                font-size: 3.5rem;
+            }
+            
+            .gallery-grid {
+                column-count: 1;
+            }
+        }
+
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🚀 Interactive Docker & Automation Tutorials</h1>
-            <p class="tagline">Learn by doing, fail safely, build confidently</p>
-            <div class="author-note">
-                <p><strong>Hey there!</strong> I'm Stacey, and I've made every Docker mistake so you don't have to. These interactive tutorials are based on real disasters, victories, and that one time I accidentally deleted everything. 🙃</p>
+
+    <header class="main-header">
+        <div class="top-bar container">
+            <div class="social-icons">
+                <a href="https://github.com/staceycranston" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="ph ph-github-logo"></i></a>
+                <a href="https://staceycranston.substack.com" target="_blank" rel="noopener noreferrer" aria-label="Substack"><i class="ph ph-substack-logo"></i></a>
             </div>
-        </header>
-
-        <main>
-            <div class="tutorials-grid">
-                <!-- Tutorial 1: Docker Beginner -->
-                <div class="tutorial-card">
-                    <span class="difficulty-badge beginner">Beginner</span>
-                    <h2>Docker Desktop: From Zero to PostgreSQL Hero</h2>
-                    <p class="tutorial-description">
-                        Start your containerization journey from absolute zero. We'll install Docker Desktop on Windows, set up PostgreSQL, connect with DBeaver, and yes—I'll tell you about the time I accidentally nuked all my data with one "helpful" command.
-                    </p>
-                    
-                    <div class="tutorial-stats">
-                        <div class="stat">
-                            <div class="stat-number">6</div>
-                            <div class="stat-label">Stages</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">60</div>
-                            <div class="stat-label">Questions</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">45-60</div>
-                            <div class="stat-label">Minutes</div>
-                        </div>
-                    </div>
-
-                    <div class="tutorial-topics">
-                        <h3>What You'll Learn:</h3>
-                        <ul>
-                            <li>System requirements & virtualization setup</li>
-                            <li>Installing Docker Desktop with WSL2</li>
-                            <li>Creating your first PostgreSQL container</li>
-                            <li>Connecting with DBeaver (GUI database tool)</li>
-                            <li>Volume management (and how NOT to delete everything)</li>
-                            <li>Best practices from painful experience</li>
-                        </ul>
-                    </div>
-
-                    <a href="docker-beginner-tutorial.html" class="start-button">Start Learning →</a>
-                </div>
-
-                <!-- Tutorial 2: Docker Networking -->
-                <div class="tutorial-card">
-                    <span class="difficulty-badge intermediate">Intermediate</span>
-                    <h2>Docker Networking: The "Connection Refused" Saga</h2>
-                    <p class="tutorial-description">
-                        Ready to add a web server to your Docker stack? This tutorial walks you through the mysterious world of container networking, port mapping, and why localhost isn't always local. Features real connection errors and their solutions!
-                    </p>
-                    
-                    <div class="tutorial-stats">
-                        <div class="stat">
-                            <div class="stat-number">6</div>
-                            <div class="stat-label">Stages</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">70</div>
-                            <div class="stat-label">Questions</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">60-75</div>
-                            <div class="stat-label">Minutes</div>
-                        </div>
-                    </div>
-
-                    <div class="tutorial-topics">
-                        <h3>What You'll Master:</h3>
-                        <ul>
-                            <li>Finding and using Docker images (httpd vs apache)</li>
-                            <li>Modifying docker-compose.yaml without breaking everything</li>
-                            <li>Understanding container isolation</li>
-                            <li>Port mapping demystified (HOST:CONTAINER)</li>
-                            <li>Debugging connection refused errors</li>
-                            <li>Making containers talk to the outside world</li>
-                        </ul>
-                    </div>
-
-                    <a href="lesson1.html" class="start-button">Start Learning →</a>
-                </div>
+            <nav class="main-nav" id="main-nav">
+                <a href="#" class="active">Home</a>
+                <a href="#">Tutorials</a>
+                <a href="#">About</a>
+                <a href="#">Contact</a>
+            </nav>
+            <div class="mobile-menu-toggle" id="mobile-menu-toggle">
+                <i class="ph ph-list"></i>
             </div>
+        </div>
+        <div class="logo-container">
+            <div class="logo">Docker Labs</div>
+        </div>
+    </header>
 
-            <div class="coming-soon">
-                <h2>🔮 Coming Soon</h2>
-                <p>More tutorials are in the works! Here's what's brewing in my Docker laboratory:</p>
-                <div class="coming-soon-list">
-                    <div class="coming-soon-item">
+    <main class="container">
+        <div class="gallery-grid">
+            <!-- Tutorial 1 -->
+            <div class="gallery-card">
+                <a href="https://StaceyCranston.github.io/docker-tutorial-html.html" target="_blank" rel="noopener noreferrer">
+                    <img src="https://images.unsplash.com/photo-1605379399642-870262d3d051?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80" alt="Code on a screen with a coffee cup">
+                    <div class="gallery-info">
+                        <h3>Docker Desktop: From Zero to Hero</h3>
+                        <p class="description">Start your containerization journey. We'll install Docker, set up PostgreSQL, and connect with a GUI.</p>
+                        <p class="difficulty beginner">Beginner</p>
+                    </div>
+                </a>
+            </div>
+            <!-- Tutorial 2 -->
+            <div class="gallery-card">
+                 <a href="https://StaceyCranston.github.io/Tutorial-2-webserver" target="_blank" rel="noopener noreferrer">
+                    <img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80" alt="Colorful code on a dark screen">
+                    <div class="gallery-info">
+                        <h3>Container Networking</h3>
+                        <p class="description">Learn container networking, port mapping, and why localhost isn't always local.</p>
+                        <p class="difficulty intermediate">Intermediate</p>
+                    </div>
+                </a>
+            </div>
+             <!-- Tutorial 3 -->
+            <div class="gallery-card under-construction">
+                 <a>
+                    <img src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80" alt="Laptop with code and network diagrams">
+                    <div class="gallery-info">
                         <h3>n8n + AI Agents</h3>
-                        <p>Self-hosted automation with AI that actually does stuff</p>
+                        <p class="description">Self-hosted automation with AI that actually does stuff for you.</p>
+                        <p class="difficulty intermediate">Under Construction</p>
                     </div>
-                    <div class="coming-soon-item">
-                        <h3>Container Communication</h3>
-                        <p>Making containers talk to each other (it's harder than it sounds)</p>
-                    </div>
-                    <div class="coming-soon-item">
-                        <h3>Docker Compose Mastery</h3>
-                        <p>Advanced patterns and real-world architectures</p>
-                    </div>
-                    <div class="coming-soon-item">
+                </a>
+            </div>
+            <!-- Tutorial 4 -->
+            <div class="gallery-card under-construction">
+                 <a>
+                    <img src="https://images.unsplash.com/photo-1526498460520-4c246339dccb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80" alt="Server racks in a data center">
+                    <div class="gallery-info">
                         <h3>Production Deployment</h3>
-                        <p>Taking your containers from laptop to cloud</p>
+                        <p class="description">Taking your containers from your laptop to a live cloud environment.</p>
+                        <p class="difficulty intermediate">Under Construction</p>
                     </div>
-                </div>
+                </a>
             </div>
+        </div>
+        
+        <div class="secondary-section">
+            <h2>🔮 More In The Works</h2>
+            <p>New tutorials are always brewing in the lab. Subscribe to get notified when new content drops.</p>
+             <a href="https://staceycranston.substack.com" target="_blank" class="subscribe-button">Subscribe on Substack</a>
+        </div>
+        
+    </main>
 
-            <div class="subscribe-cta">
-                <h3>Want More Tutorials?</h3>
-                <p>Subscribe to my Substack for new tutorials, war stories, and automation tips. It's free, and I promise to only send emails when I have something genuinely useful to share.</p>
-                <p><a href="https://staceycranston.substack.com" target="_blank">Subscribe on Substack →</a></p>
-            </div>
-        </main>
+    <footer class="main-footer">
+        <p>© 2025 Docker Labs. Created by <a href="#">Stacey Cranston</a>.</p>
+    </footer>
 
-        <footer>
-            <p>Created with ☕ and stubbornness by <a href="https://staceycranston.substack.com" target="_blank">Stacey Cranston</a></p>
-            <p>Questions? Found a bug? <a href="https://github.com/staceycranston" target="_blank">GitHub</a> | <a href="https://staceycranston.substack.com" target="_blank">Substack</a></p>
-            <p><small>Remember: Every expert was once a disaster. You're just on your journey to expertise. 🚀</small></p>
-        </footer>
-    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('mobile-menu-toggle');
+            const mainNav = document.getElementById('main-nav');
+
+            menuToggle.addEventListener('click', function() {
+                mainNav.classList.toggle('active');
+            });
+        });
+    </script>
 </body>
 </html>
