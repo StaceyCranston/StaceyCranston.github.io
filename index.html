@@ -113,16 +113,16 @@
 
         /* --- Gallery Grid --- */
         .gallery-grid {
-            column-count: 2;
-            column-gap: 25px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
             padding: 0 20px;
         }
 
         .gallery-card {
-            display: inline-block;
+            display: flex;
+            flex-direction: column;
             width: 100%;
-            margin-bottom: 25px;
-            break-inside: avoid;
         }
         
         .gallery-card a {
@@ -235,7 +235,7 @@
         /* --- Responsive --- */
         @media (max-width: 992px) {
             .gallery-grid {
-                column-count: 2;
+                grid-template-columns: repeat(2, 1fr);
             }
         }
         
@@ -266,7 +266,7 @@
             }
             
             .gallery-grid {
-                column-count: 1;
+                grid-template-columns: 1fr;
             }
         }
 
